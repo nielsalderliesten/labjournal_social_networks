@@ -12,15 +12,14 @@ navbar:
       href: index.html
     - text: "My journal"
       menu:
-      - text: "Week 1"
-        href: Week1.Rmd
-        
+      - text: "Week 1"  
+        href: Week1.html
         # here, other .Rmds can be added
 
 
   right:
   - icon: fab fa-github
-    href: https://nielsalderliesten.github.io/labjournal_social_networks
+    href: https://nielsalderliesten.github.io/labjournal_social_networks/
 output:
   html_document:
     theme: flatly

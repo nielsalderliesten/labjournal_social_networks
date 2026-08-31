@@ -1,8 +1,7 @@
 ---
-title: "Week 1"
+title: "Lab journal Social Networks"
 author: "Niels Alderliesten"
-date: "2026-08-31"
-output: html_document
+bibliography: references.bib
 ---
 
 ```{r setup, include=FALSE}
