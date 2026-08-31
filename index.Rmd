@@ -4,8 +4,7 @@ author: "Niels Alderliesten"
 bibliography: references.bib
 ---
 
-You got this! 
-
+You got this!
 
 ```{r, install remotely, globalsettings, echo=FALSE, warning=FALSE, results='hide'}
 #install.packages("remotes")
@@ -39,6 +38,8 @@ It also demonstrate, you can add html directly in your rmarkdown file. See: http
 see here: https://bookdown.org/yihui/rmarkdown-cookbook/multi-column.html 
 But please note, we are not here to make a beautiful website, our intention is just to have a quick lab journal up and running --->
 ```
+
+<!--- THis is a note, as you can tell it is not a hashtag. AS you know, hashtags work for headers. --->
 
 ::::: columns
 ::: {.column width="50%"}
@@ -79,5 +80,96 @@ We, Jochem Tolsma and Bas Hofstra, use this repository for our Social Network An
 Use the top menu to navigate through the journal.
 
 ------------------------------------------------------------------------
+
+##Week 1 Seminar
+
+```{r}
+library(tidyverse)
+library(haven)
+
+```
+
+```{r}
+tesvariable <- 4
+anothertestvariable <- 6
+#look in your environment tab. You now see you have something there. 
+ls()
+list = ls()
+list
+ls()
+rm(list)
+ls()
+#? :-)
+rm(list=ls())
+ls()
+
+?ls
+
+```
+
+
+```{r}
+
+cv08 <- haven::read_sav(file = "Cultural_Changes_2008.sav")
+cv10 <- haven::read_sav(file = "Cultural_Changes_2010.sav")
+
+head(names(cv08))
+?head
+summary(cv08)
+head(cv08)
+str(cv08, 3)
+# what happens if you change the 1 with a 2 or 3? Check the help function or just try and see.
+class(cv08)
+attributes(cv08)
+
+```
+```{r}
+table(cv08$lftop, useNA = "always")
+cv08$lftop_new <- cv08$lftop
+cv08$lftop_new[cv08$lftop_new == 99] <- NA
+
+table(cv08$lftop_new, useNA = "always")
+attributes(cv08$lftop_new)
+attr(cv08$lftop, "labels")
+
+```
+```{r}
+cv08 <- mutate(.data = cv08, lftop_new = na_if(lftop, 99))
+table(cv08$lftop_new, useNA = "always")
+
+
+cv08 %>%
+  mutate(
+    educ3 = case_match(
+      var006n,
+      c(-3, -1, 10) ~ "missing",
+      c(1) ~ "primary",
+      c(2, 3, 4) ~ "secondary",
+      c(5, 6, 7, 8) ~ "tertiary"
+    ),
+    educ3 = as.factor(educ3)
+  ) -> cv08
+
+table(cv08$educ3)
+
+class(cv08$geslacht)
+attributes(cv08$geslacht)$labels
+table(cv08$geslacht, useNA = "always")
+
+cv08 <- cv08 %>%
+    mutate(geslacht_n = case_match(geslacht, "9" ~ NA, "M" ~ 0, "V" ~ 1))
+
+cv08 <- cv08 %>%
+  mutate(geslacht_n = recode_values(geslacht, "9" ~ NA, "M" ~ 0, "V" ~ 1), geslacht_n = labelled(geslacht_n,
+        labels = c(man = 0, vrouw = 1)))
+
+table(cv08$geslacht_n)
+
+```
+
+
+------------------------------------------------------------------------
+
+
 
 # References
