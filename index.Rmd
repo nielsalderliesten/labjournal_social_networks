@@ -1,24 +1,15 @@
 ---
-title: "Lab journal"
-author: "by: Your Name"
+title: "Lab journal Social Networks"
+author: "Niels Alderliesten"
 bibliography: references.bib
 ---
 
-wsdfghjhgfd
+You got this! 
 
-listy:
-
-1.  gfhjkl
-2.  hjkl;
-3.  
-
-```{r}
-2 + 2 
-```
 
 ```{r, install remotely, globalsettings, echo=FALSE, warning=FALSE, results='hide'}
-install.packages("remotes")
-remotes::install_github("rlesur/klippy")
+#install.packages("remotes")
+#remotes::install_github("rlesur/klippy")
 ```
 
 ```{r, globalsettings, echo=FALSE, warning=FALSE, results='hide'}
@@ -55,7 +46,7 @@ But please note, we are not here to make a beautiful website, our intention is j
 
 Last compiled on `r format(Sys.time(), '%B, %Y')`
 
-*Describe lab journal here.*
+*My first description*
 
 <br>
 
