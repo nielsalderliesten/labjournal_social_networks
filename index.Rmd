@@ -45,9 +45,9 @@ But please note, we are not here to make a beautiful website, our intention is j
 ::: {.column width="50%"}
 # My Lab Journal
 
-Last compiled on `r format(Sys.time(), '%B, %Y')`
+<!---Last compiled on `r format(Sys.time(), '%B, %Y')` --->
 
-*My first description*
+Welcome to my Lab Journal and assignments-page constructed during the *Social Networks* course by Jochem Tolsma at the Radboud Universiteit.
 
 <br>
 

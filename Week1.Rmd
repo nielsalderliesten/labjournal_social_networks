@@ -10,17 +10,57 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Week 1
 
-## Set-up
+<!--- I need to fix the lay-out to hide results etc. --->
 
-```{r}
+::::: columns
+::: {.column width="50%"}
+
+Last compiled on `r format(Sys.time(), '%B, %Y')`
+
+This page documents my progress made during my first week following the course Social Networks
+
+<br>
+
+------------------------------------------------------------------------
+
+## Research questions
+
+We were asked to formulate a Descriptive and Explanatory research question. To aid in answering these research questions, we were asked to find 2 research papers relevant to the subject at hand. 
+After much deliberating and thinking on what I would like to research (while fitting a social network analysys perspective), I have the following research questions currently in mind:
+
+Descriptive question:
+*Do MPs elected in cabinet have a higher in-degree out-degree popularity than non-elected MPs?*
+
+Explanatory question:
+*Does inter-party interaction on Twitter influence party collaboration in amendments?*
+
+<!--- this is a reference, stored in references.bib. It will be automatically added at the bottom of the page --->
+
+------------------------------------------------------------------------
+
+##Papers
+
+* **"Twitter and divides in the Dutch parliament: social and political segregation in the following, @-mentions and retweets networks"**
+* **Political Opinions and Offline Social Networks in a Swiss Student Community**
+
+:::
+
+
+
+## R Tutorial
+
+We were also asked to read and go through Appendix A and B of *insert reference here*. I am currently still debating on how best to include this in the lab journal. This R tutorial section will therefore be updated on a later date. 
+
+```{r, include=FALSE}}
 library(tidyverse)
 library(haven)
 
 ```
 
-##Seminar
+##Appendix A
 
-```{r}
+<!--- Random code testing --->
+```{r, include=FALSE}}
 tesvariable <- 4
 anothertestvariable <- 6
 #look in your environment tab. You now see you have something there. 
@@ -38,8 +78,9 @@ ls()
 
 ```
 
+<!-- Loading folders, analyzing the data-frame -->
 
-```{r}
+```{r,include=FALSE}}
 
 cv08 <- haven::read_sav(file = "Cultural_Changes_2008.sav")
 cv10 <- haven::read_sav(file = "Cultural_Changes_2010.sav")
@@ -54,7 +95,7 @@ class(cv08)
 attributes(cv08)
 
 ```
-```{r}
+```{r, include=FALSE}}
 table(cv08$lftop, useNA = "always")
 cv08$lftop_new <- cv08$lftop
 cv08$lftop_new[cv08$lftop_new == 99] <- NA
@@ -64,7 +105,11 @@ attributes(cv08$lftop_new)
 attr(cv08$lftop, "labels")
 
 ```
-```{r}
+
+<!-- Changing educ3 and eslacht to proper labels and values-->
+
+
+```{r, include=FALSE}}
 cv08 <- mutate(.data = cv08, lftop_new = na_if(lftop, 99))
 table(cv08$lftop_new, useNA = "always")
 
@@ -87,13 +132,134 @@ class(cv08$geslacht)
 attributes(cv08$geslacht)$labels
 table(cv08$geslacht, useNA = "always")
 
-cv08 <- cv08 %>%
-    mutate(geslacht_n = case_match(geslacht, "9" ~ NA, "M" ~ 0, "V" ~ 1))
 
 cv08 <- cv08 %>%
-  mutate(geslacht_n = recode_values(geslacht, "9" ~ NA, "M" ~ 0, "V" ~ 1), geslacht_n = labelled(geslacht_n,
-        labels = c(man = 0, vrouw = 1)))
-
-table(cv08$geslacht_n)
+    mutate(geslacht_n = case_match(geslacht, "9" ~ NA, "M" ~ 0, "V" ~ 1), geslacht_n = labelled(geslacht_n, labels = c(man = 0, vrouw = 1)))
 
 ```
+
+<!-- Re-labelling int055 through int057-->
+
+```{r, include=FALSE}}
+attr(cv08$int055, "labels")
+attr(cv08$geslacht_n, "labels")
+
+cv08 <- cv08 %>% 
+  mutate(int055_n = case_match(int055, 
+                               1 ~ 4, 
+                               2 ~ 3, 
+                               3 ~ 2, 
+                               4 ~ 1, 
+                               .default = NA),
+         int055 = labelled(int055_n, labels = c('Zeer groot' = 4, 'Groot' = 3, 'Niet zo groot' = 2, 'Helemaal geen tegenstelling' = 1 )))
+
+cv08 <- cv08 %>% 
+  mutate(int056_n = case_match(int056, 
+                               1 ~ 4, 
+                               2 ~ 3, 
+                               3 ~ 2, 
+                               4 ~ 1, 
+                               .default = NA),
+         int055 = labelled(int056_n, labels = c('Zeer groot' = 4, 'Groot' = 3, 'Niet zo groot' = 2, 'Helemaal geen tegenstelling' = 1 )))
+
+cv08 <- cv08 %>% 
+  mutate(int057_n = case_match(int057, 
+                               1 ~ 4, 
+                               2 ~ 3, 
+                               3 ~ 2, 
+                               4 ~ 1, 
+                               .default = NA),
+         int055 = labelled(int057_n, labels = c('Zeer groot' = 4, 'Groot' = 3, 'Niet zo groot' = 2, 'Helemaal geen tegenstelling' = 1 )))
+
+#Calculating the mean, if amount of NA is smaller than 2
+
+cv08 <- cv08 %>%
+  rowwise () %>%
+  mutate(int_mean = mean(c(int055_n, int056_n, int057_n), na.rm = T), nmis = sum(c(is.na(int055_n), is.na(int056_n), is.na(int057_n))), int_mean = ifelse(nmis < 2, int_mean, NA)) %>%
+  dplyr::select(-nmis)
+
+```
+
+<!-- Selecting the correct variables we want in our new cleaned data-set -->
+```{r, include=FALSE}}
+cv08_cleaned <- cv08 %>%
+  dplyr::select(c("we_id", "lftop", "geslacht", "var006n", "v401", "landd"))
+
+cv10_cleaned <- cv10 %>%
+  dplyr::select(c("Sleutel", "var002", "var001", "Vltoplop", "V401", "Landd"))
+
+```
+
+```{r, include=FALSE}}
+names(cv08_cleaned) <- names(cv10_cleaned) <- c("id", "age", "sex", "educ", "health", "region")
+
+cv08_cleaned <- cv08_cleaned %>% mutate(age = na_if(age, 99))
+cv10_cleaned <- cv10_cleaned %>% mutate(age = na_if(age, 99))
+
+cv08_cleaned <- cv08_cleaned %>% mutate(
+  men = recode_values(sex, "9" ~ -9, "M" ~ 1, "V" ~ 0),
+  men = na_if(men, -9), 
+  men = labelled(men, c("man" = 1, "vrouw" = 0)))
+
+cv10_cleaned <- cv10_cleaned %>% mutate(
+  men = recode_values(sex, c(2) ~ 0), 
+  men = labelled(men, c("man" = 1, "vrouw" = 0)))
+
+
+attr(cv08_cleaned$educ,"labels")
+
+
+
+cv08_cleaned <- cv08_cleaned %>%
+  mutate(
+    educ3 = recode_values(educ, 
+                      c(-3,9999999999 ) ~ NA,
+                      c(-1, 1)  ~ 1, 
+                      c(2,3,4,5) ~ 2, 
+                      c(6,7,8) ~ 3),
+    educ3 = factor(educ3, 
+                   levels = c(1, 2, 3), 
+                   labels =  c("primary", "secondary", "tertiary")))
+
+cv10_cleaned <- cv10_cleaned %>%
+  mutate(
+    educ3 = recode_values(educ, 
+                       c(-1, 1) ~ 1,
+                       c(2,3,4) ~ 2, 
+                       c(5) ~ 3, 
+                       c(9999999999) ~ NA),
+    educ3 = factor(educ3, 
+                   levels = c(1, 2, 3), 
+                   labels = c("primary", "secondary", "tertiary")))
+
+cv08_cleaned$wave <- 2008
+cv10_cleaned$wave <- 2010
+
+cv08_cleaned$id2 <- rank(cv08_cleaned$id)
+cv10_cleaned$id2 <- rank(cv10_cleaned$id)
+
+cv10_cleaned <- cv10_cleaned %>%
+  dplyr::select(c("id", "id2", "age", "men", "educ3", "health", "region", "wave"))
+
+#FOllowing code also works btw:
+#cv08_cleaned <- cv08_cleaned %>%
+#dplyr::select(id, id2, age, men, educ3, health, region, wave)
+
+#Adding them together:
+cv08_10_cleaned <- cv08_cleaned %>%
+  add_row(cv10_cleaned)
+
+```
+
+<!-- Time to make it into a wide format? -->
+``` {r, include=F}
+psych::describe(cv08_10_cleaned)
+
+cv08_10_cleaned_wide <- full_join(cv08_cleaned, cv10_cleaned, by = "id2", suffix = c(".2008", ".2010"))
+
+cv08_10_cleaned_wide <- cv08_10_cleaned_wide %>% 
+  mutate(health = recode_values(health, -1 ~ NA))
+#this wasn't working, this is where I stopped :)
+
+```
+
