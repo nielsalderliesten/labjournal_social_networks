@@ -52,7 +52,7 @@ Explanatory question:
 
 We were also asked to read and go through Appendix A and B of *insert reference here*. I am currently still debating on how best to include this in the lab journal. This R tutorial section will therefore be updated on a later date. 
 
-```{r, include=FALSE}}
+```{r, include=FALSE}
 library(tidyverse)
 library(haven)
 
@@ -61,7 +61,7 @@ library(haven)
 ##Appendix A
 
 <!--- Random code testing --->
-```{r, include=FALSE}}
+```{r, include=FALSE}
 tesvariable <- 4
 anothertestvariable <- 6
 #look in your environment tab. You now see you have something there. 
@@ -81,7 +81,7 @@ ls()
 
 <!-- Loading folders, analyzing the data-frame -->
 
-```{r,include=FALSE}}
+```{r,include=FALSE}
 
 cv08 <- haven::read_sav(file = "Cultural_Changes_2008.sav")
 cv10 <- haven::read_sav(file = "Cultural_Changes_2010.sav")
@@ -96,7 +96,8 @@ class(cv08)
 attributes(cv08)
 
 ```
-```{r, include=FALSE}}
+
+```{r, include=FALSE}
 table(cv08$lftop, useNA = "always")
 cv08$lftop_new <- cv08$lftop
 cv08$lftop_new[cv08$lftop_new == 99] <- NA
@@ -110,7 +111,7 @@ attr(cv08$lftop, "labels")
 <!-- Changing educ3 and eslacht to proper labels and values-->
 
 
-```{r, include=FALSE}}
+```{r, include=FALSE}
 cv08 <- mutate(.data = cv08, lftop_new = na_if(lftop, 99))
 table(cv08$lftop_new, useNA = "always")
 
@@ -141,7 +142,7 @@ cv08 <- cv08 %>%
 
 <!-- Re-labelling int055 through int057-->
 
-```{r, include=FALSE}}
+```{r, include=FALSE}
 attr(cv08$int055, "labels")
 attr(cv08$geslacht_n, "labels")
 
@@ -182,7 +183,7 @@ cv08 <- cv08 %>%
 ```
 
 <!-- Selecting the correct variables we want in our new cleaned data-set -->
-```{r, include=FALSE}}
+```{r, include=FALSE}
 cv08_cleaned <- cv08 %>%
   dplyr::select(c("we_id", "lftop", "geslacht", "var006n", "v401", "landd"))
 
@@ -191,7 +192,7 @@ cv10_cleaned <- cv10 %>%
 
 ```
 
-```{r, include=FALSE}}
+```{r, include=FALSE}
 names(cv08_cleaned) <- names(cv10_cleaned) <- c("id", "age", "sex", "educ", "health", "region")
 
 cv08_cleaned <- cv08_cleaned %>% mutate(age = na_if(age, 99))
