@@ -1,0 +1,38 @@
+---
+title: "Cheatsheet"
+author: "Niels Alderliesten"
+date: "2026-08-31"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Functions:
+
+install.packages() # to install additional packages. Only do this once or to update package.
+require() # activate installed package
+setwd() # set your working directory
+ls() # list the objects in your environment
+rm() # to remove objects
+str()
+summary()
+attributes()
+attr()
+table()
+names()
+head()
+fix()
+View()
+
+##Packages:
+
+tidyverse # a bunch of packages which allows for a completely different ’dialect’of programming/scripting in R.
+
+##Operators / symbols:
+
+? # if placed in front of a function opens up the help pages.
+<- # used to assign values/objects to a different object.
+= # used to assign values/objects to arguments within a function.
+$ # to assess specific attributes

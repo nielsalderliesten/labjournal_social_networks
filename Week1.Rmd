@@ -40,8 +40,9 @@ Explanatory question:
 
 ##Papers
 
-* **"Twitter and divides in the Dutch parliament: social and political segregation in the following, @-mentions and retweets networks"**
-* **Political Opinions and Offline Social Networks in a Swiss Student Community**
+**"Twitter and divides in the Dutch parliament: social and political segregation in the following, @-mentions and retweets networks"**
+
+**Political Opinions and Offline Social Networks in a Swiss Student Community**
 
 :::
 
