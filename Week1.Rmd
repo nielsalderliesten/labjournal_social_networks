@@ -259,8 +259,8 @@ psych::describe(cv08_10_cleaned)
 
 cv08_10_cleaned_wide <- full_join(cv08_cleaned, cv10_cleaned, by = "id2", suffix = c(".2008", ".2010"))
 
-cv08_10_cleaned_wide <- cv08_10_cleaned_wide %>% 
-  mutate(health = recode_values(health, -1 ~ NA))
+#cv08_10_cleaned_wide <- cv08_10_cleaned_wide %>% 
+ # mutate(health = recode_values(health, -1 ~ NA))
 #this wasn't working, this is where I stopped :)
 
 ```
