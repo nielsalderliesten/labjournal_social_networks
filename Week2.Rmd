@@ -1,0 +1,360 @@
+---
+title: "Week 2"
+author: "Niels Alderliesten"
+date: "2026-09-07"
+output: html_document
+---
+
+```{r, globalsettings, echo=FALSE, warning=FALSE}
+library(knitr)
+library(styler)
+
+knitr::opts_chunk$set(echo = TRUE)
+opts_chunk$set(tidy.opts=list(width.cutoff=100),tidy=TRUE, warning = FALSE, message = FALSE,comment = "#>", cache=TRUE, class.source=c("test"), results='hold', class.output=c("test2"), cache.lazy= F, eval=F)
+options(width = 100)
+rgl::setupKnitr()
+
+```
+
+
+# Week 2
+
+:::: columns
+::: {.column width="50%"}
+Last compiled on `r format(Sys.time(), '%B, %Y')`
+
+<!-- ## Descriptives Time! -->
+
+<!-- Installing libraries) -->
+
+```{r, include=F}
+#install.packages("RSiena")
+#install.packages("igraph")
+
+library(RSiena)
+library(igraph)
+library(tidyverse)
+library(igraph)
+
+
+```
+
+<!-- Viewing random stuff -->
+
+```{r, include=F}
+?s501
+str(s501)
+View(s501)
+class(s501)
+safetymatrix <- s501
+
+```
+
+```{r, include=F}
+
+#install.packages("network")
+#install.packages("sna")
+library(network)
+library(sna)
+
+library(RSiena)
+net1 <- network::as.network(safetymatrix)
+drink <- s50a
+
+View(drink)
+
+class(net1)
+#snam1 <- sna::nacf(net1, drink[,1])
+#Above code was not finished. 
+
+```
+
+## Chapter 6 SNASS
+
+In chapter 6 of [@SNASS], we first start with analyzing **segregation**.
+
+
+```{r}
+library(RSiena)
+library(network)
+
+friend.data.w1 <- s501
+friend.data.w2 <- s502
+friend.data.w3 <- s503
+
+drink <- s50a
+smoke <- s50s
+
+class(friend.data.w1) 
+```
+
+As you can see, they are currently a matrix. So I made them a network class!
+
+```{r}
+
+net1 <- network::as.network(friend.data.w1)
+net2 <- network::as.network(friend.data.w2)
+net3 <- network::as.network(friend.data.w3)
+class(net1) #See! They're a network now.
+
+```
+
+I then use the package sna to calculate Moran's I. 'nacf' computes the sample network covariance/correlation for a specified variable. It is also possible to compute Moran's I with this, which I am  going to do now. 
+
+```{r}
+library(sna)
+
+snam1 <- sna::nacf(net1, drink[,1], type = "moran", neighborhood.type = "out", demean=T)
+print(snam1) #As you can see, a lot of output given. We need the second list-element. Therefore:
+snam1[2] #0.4331431 
+
+```
+
+```{r}
+
+geodistances <- sna::geodist(net1, count.paths = T) #Counts the lengths of a geodesics? among nodes. I think basically it measures the shortest distance
+geodistances <- geodistances$gdist
+print(geodistances) #As you can see, INF is used for dissconnected nodes. THe rest i assume is path length
+
+#First we have to define a weight
+weights1 <- geodistances == 1
+
+library(ape)
+#ape::Moran.I calculates Moran's I autocorrelation coefficient of variable given a matrix of weights.
+ape::Moran.I(drink[,1], scaled = F, weight = weights1, na.rm=T)
+#AS you can see, $observed (=0.486134) is close to sna::nacf(0.4331431) but not quite.
+
+```
+
+```{r}
+#import function of Jochem":
+
+fMoran.I <- function(x, weight, scaled = FALSE, na.rm = FALSE, alternative = "two.sided", rowstandardize = TRUE) {
+    if (rowstandardize) {
+        if (dim(weight)[1] != dim(weight)[2])
+            stop("'weight' must be a square matrix")
+        n <- length(x)
+        if (dim(weight)[1] != n)
+            stop("'weight' must have as many rows as observations in 'x'")
+        ei <- -1/(n - 1)
+        nas <- is.na(x)
+        if (any(nas)) {
+            if (na.rm) {
+                x <- x[!nas]
+                n <- length(x)
+                weight <- weight[!nas, !nas]
+            } else {
+                warning("'x' has missing values: maybe you wanted to set na.rm = TRUE?")
+                return(list(observed = NA, expected = ei, sd = NA, p.value = NA))
+            }
+        }
+        ROWSUM <- rowSums(weight)
+        ROWSUM[ROWSUM == 0] <- 1
+        weight <- weight/ROWSUM
+        s <- sum(weight)
+        m <- mean(x)
+        y <- x - m
+        cv <- sum(weight * y %o% y)
+        v <- sum(y^2)
+        obs <- (n/s) * (cv/v)
+        if (scaled) {
+            i.max <- (n/s) * (sd(rowSums(weight) * y)/sqrt(v/(n - 1)))
+            obs <- obs/i.max
+        }
+        S1 <- 0.5 * sum((weight + t(weight))^2)
+        S2 <- sum((apply(weight, 1, sum) + apply(weight, 2, sum))^2)
+        s.sq <- s^2
+        k <- (sum(y^4)/n)/(v/n)^2
+        sdi <- sqrt((n * ((n^2 - 3 * n + 3) * S1 - n * S2 + 3 * s.sq) - k * (n * (n - 1) * S1 - 2 * n *
+            S2 + 6 * s.sq))/((n - 1) * (n - 2) * (n - 3) * s.sq) - 1/((n - 1)^2))
+        alternative <- match.arg(alternative, c("two.sided", "less", "greater"))
+        pv <- pnorm(obs, mean = ei, sd = sdi)
+        if (alternative == "two.sided")
+            pv <- if (obs <= ei)
+                2 * pv else 2 * (1 - pv)
+        if (alternative == "greater")
+            pv <- 1 - pv
+        list(observed = obs, expected = ei, sd = sdi, p.value = pv)
+    } else {
+        if (dim(weight)[1] != dim(weight)[2])
+            stop("'weight' must be a square matrix")
+        n <- length(x)
+        if (dim(weight)[1] != n)
+            stop("'weight' must have as many rows as observations in 'x'")
+        ei <- -1/(n - 1)
+        nas <- is.na(x)
+        if (any(nas)) {
+            if (na.rm) {
+                x <- x[!nas]
+                n <- length(x)
+                weight <- weight[!nas, !nas]
+            } else {
+                warning("'x' has missing values: maybe you wanted to set na.rm = TRUE?")
+                return(list(observed = NA, expected = ei, sd = NA, p.value = NA))
+            }
+        }
+        # ROWSUM <- rowSums(weight) ROWSUM[ROWSUM == 0] <- 1 weight <- weight/ROWSUM
+        s <- sum(weight)
+        m <- mean(x)
+        y <- x - m
+        cv <- sum(weight * y %o% y)
+        v <- sum(y^2)
+        obs <- (n/s) * (cv/v)
+        if (scaled) {
+            i.max <- (n/s) * (sd(rowSums(weight) * y)/sqrt(v/(n - 1)))
+            obs <- obs/i.max
+        }
+        S1 <- 0.5 * sum((weight + t(weight))^2)
+        S2 <- sum((apply(weight, 1, sum) + apply(weight, 2, sum))^2)
+        s.sq <- s^2
+        k <- (sum(y^4)/n)/(v/n)^2
+        sdi <- sqrt((n * ((n^2 - 3 * n + 3) * S1 - n * S2 + 3 * s.sq) - k * (n * (n - 1) * S1 - 2 * n *
+            S2 + 6 * s.sq))/((n - 1) * (n - 2) * (n - 3) * s.sq) - 1/((n - 1)^2))
+        alternative <- match.arg(alternative, c("two.sided", "less", "greater"))
+        pv <- pnorm(obs, mean = ei, sd = sdi)
+        if (alternative == "two.sided")
+            pv <- if (obs <= ei)
+                2 * pv else 2 * (1 - pv)
+        if (alternative == "greater")
+            pv <- 1 - pv
+        list(observed = obs, expected = ei, sd = sdi, p.value = pv)
+    }
+}  
+
+fMoran.I(drink[,1], scaled=F, weight=weights1, na.rm = T, rowstandardize = F)
+#Now the $observed (0.4331431) is the same! But the primarily change with JOchem's function is that it automatically standardizes. So rowstandardization matters! (nacff does it automatically, ape does not.)
+
+#I don't quite understand the rowstandardization yet.
+
+```
+
+```{r}
+
+#But now, let's calculate a correlation between ctor i and all the alters to whom it is connected (direct or indirectly) and where alters at a larger distances (longer shortest path lengths) are weighted less.
+
+#step 1 for each acter i determine the distances (shortest path lengths) to all other nodes in the network.
+#Set the distance to yourself as INf.
+diag(geodistances) <- Inf
+
+#Step 2: based on these distances decide on how we want to weigh. That is, determine a distance decay function. This one is pretty standard in the spatial autocorrelation literature but actually pretty arbitrary
+weights2 <- exp(-geodistances)
+
+#Step 3: decide whether or not we want to row-standardize. You do not:
+fMoran.I(drink[,1], scaled=F, weight=weights2, na.rm = T, rowstandardize = F)
+# 0.2817188. Apparently, we are a like to alters very close by (path length one) and less so (or even dissimilar) to alters further off.
+
+```
+
+```{r}
+#My own question: How to count dyad and triad configurations?
+
+#Time to test significance. 
+#Let's first generate random graphs. I could not get the code of 6.2 to work sadly.
+
+#Trying it out with Zachary
+
+igraph::edge_density(zachary_g, loops=F)
+density <- round(edge_density(zachary_g), 2)
+trial <- 1000
+trialclus <- triallen <- rep(NA, trial)
+
+for (i in 1:trial) {
+  random_graph <- sample_gnp(n = 34, p=density, directed=F) #generates the random graphs
+  triallen[i] <- mean_distance(random_graph, unconnected=T) #calculates the average path length
+  trialclus[i] <- transitivity(random_graph, isolates = c("NaN")) #calculates the clustering
+}
+
+par(mfrow = c(1,2))
+{
+  hist(trialclus, xlim = c(0.0, 0.30), main = "Average clustering coefficient", xlab = "",)
+  abline(v = transitivity(zachary_g, isolates=c("NaN")), col = "red", lwd=3)
+}
+
+{
+  hist(triallen, xlim = c(1.9, 3), main = "Average path length", xlab = "",)
+  abline(v = mean_distance(zachary_g, unconnected=T), col = "red", lwd=3)
+}
+
+#As you can see, Zachary has an above expected clustering. But the path length is extremely average. 
+```
+
+## Further descriptives
+
+Node descriptives
+
+```{r}
+#Example with Zachary from igraph
+
+zachary_g <- make_graph("Zachary")
+plot(zachary_g)
+
+#Pretty, now let's make it an adjacancy matrix
+zachary_amat <- as_adjacency_matrix(zachary_g, type = "both", sparse = F)
+view(zachary_amat)
+
+#NUmber of nodes
+igraph::vcount(zachary_g)
+#Number of edges
+igraph::ecount(zachary_g)
+#degree
+igraph::degree(zachary_g)
+  #pretty plot?
+  hist(degree(zachary_g), xlabs='indegree', mains= 'Histogram of indegree')
+  #Doesn't work quite yet I think
+
+#Transitivity
+igraph::transitivity(zachary_g, type = c("localundirected"), isolates = c("NaN", "zero"))
+
+#Betweenness
+igraph::betweenness(zachary_g, directed=F)
+
+#As you can see. Node 1, 33 and 34 have an extremely high degree, betweenness, but do not have a big transitivity index (which is logical if they are connected with a lot of people, there is bound to be less triads closed)
+```
+
+Diad & Triad descriptives
+
+```{r}
+igraph::dyad_census(zachary_g) #Would give the number of relationships, including whether it is mutual, assymmetric or non-existent. Therefore only works with directed graphs, which zachary_g is not :). It therefore only gives mutual and null, not asymmetical etc.
+
+igraph::triad_census(zachary_g) #Same problem as with dyad_census. BUt it still gives the amount of connections.
+sna::triad.census(zachary_amat)
+
+#Either
+45/393 #= 0.1145038
+45 / (3971 + 1575 + 393) #= 0.007577033
+igraph::transitivity(zachary_g, type = c("global"), isolates = c("NaN", "zero")) # 0.2556818
+sna::gtrans(zachary_amat) #0.2556818
+#Conclusion: I do not know how to calculate transitivity
+
+```
+
+Network Visualisation
+
+```{r}
+plot(zachary_g)
+#Let's make those with a larger betweeness, also larger in the graph
+
+V(zachary_g)$size = betweenness(zachary_g, normalized = T, directed = F) * 70 + 15 #*70 refers to the size of the larger betweeness (or something), while the +15 refers to the size of the other nodes
+plot(zachary_g)
+
+#Make them further apart!
+set.seed(2345)
+layout1 <- layout_with_mds(zachary_g)
+plot(zachary_g, layout=layout1)
+
+#We change the coordinates of the nodes in the new layout we created
+layout1
+layout1[1, 1] <- 4 #THe x axis of node 1 is now further to the right
+layout1[34, 1] <- -4
+plot(zachary_g, layout=layout1)
+
+#Let's add a note for transparancy sake (as we altered the coordination of two nodes)
+#Is this really the same as statistically changing something? 
+plot(zachary_g, layout=layout1, margin = c(0,0,0,0))
+legend(x = -2, y = -1.5, c("Note: the position of nodes 1 and 34 have been altered by Niels Alderliesten \n and
+                         Jochem Toslam for visualisation purposes only. These changes do not \n
+                         reflect network properties"), bty = "n", cex =0.8) #For some reason the legend does not show up
+
+
+
+```

@@ -4,17 +4,29 @@ author: "Niels Alderliesten"
 bibliography: references.bib
 ---
 
-```{r setup, include=FALSE}
+```{r, globalsettings, echo=FALSE, warning=FALSE}
+library(knitr)
+library(styler)
+
 knitr::opts_chunk$set(echo = TRUE)
+opts_chunk$set(tidy.opts=list(width.cutoff=100),tidy=TRUE, warning = FALSE, message = FALSE,comment = "#>", cache=TRUE, class.source=c("test"), results='hold', class.output=c("test2"), cache.lazy= F, eval=F)
+options(width = 100)
+rgl::setupKnitr()
+
+```
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy(position = c('top', 'right'))
+#klippy::klippy(color = 'darkred')
+#klippy::klippy(tooltip_message = 'Click to copy', tooltip_success = 'Done')
 ```
 
 # Week 1
 
 <!--- I need to fix the lay-out to hide results etc. --->
 
-::::: columns
+:::: columns
 ::: {.column width="50%"}
-
 Last compiled on `r format(Sys.time(), '%B, %Y')`
 
 This page documents my progress made during my first week following the course Social Networks
@@ -25,32 +37,27 @@ This page documents my progress made during my first week following the course S
 
 ## Research questions
 
-We were asked to formulate a Descriptive and Explanatory research question. To aid in answering these research questions, we were asked to find 2 research papers relevant to the subject at hand. 
-After much deliberating and thinking on what I would like to research (while fitting a social network analysys perspective), I have the following research questions currently in mind:
+We were asked to formulate a Descriptive and Explanatory research question. To aid in answering these research questions, we were asked to find 2 research papers relevant to the subject at hand. After much deliberating and thinking on what I would like to research (while fitting a social network analysys perspective), I have the following research questions currently in mind:
 
-Descriptive question:
-*Do MPs elected in cabinet have a higher in-degree out-degree popularity than non-elected MPs?*
+Descriptive question: *Do MPs elected in cabinet have a higher in-degree out-degree popularity than non-elected MPs?*
 
-Explanatory question:
-*Does inter-party interaction on Twitter influence party collaboration in amendments?*
+Explanatory question: *Does inter-party interaction on Twitter influence party co-voting in motions?*
 
 <!--- this is a reference, stored in references.bib. It will be automatically added at the bottom of the page --->
 
-------------------------------------------------------------------------
+## Papers
 
-##Papers
+The following two papers were selected to aid in answering the above formulated questions. 
 
-**"Twitter and divides in the Dutch parliament: social and political segregation in the following, @-mentions and retweets networks"**
+**"Twitter and divides in the Dutch parliament: social and political segregation in the following, \@-mentions and retweets networks"** [@tolsmatwitter]
 
-**Political Opinions and Offline Social Networks in a Swiss Student Community**
+**Political Opinions and Offline Social Networks in a Swiss Student Community** [@mephamthesis]
 
 :::
 
-
-
 ## R Tutorial
 
-We were also asked to read and go through Appendix A and B of *insert reference here*. I am currently still debating on how best to include this in the lab journal. This R tutorial section will therefore be updated on a later date. 
+We were also asked to read and go through Appendix A and B of [@SNASS] I am currently still debating on how best to include this in the lab journal. This R tutorial section will therefore be updated on a later date.
 
 ```{r, include=FALSE}
 library(tidyverse)
@@ -58,9 +65,11 @@ library(haven)
 
 ```
 
-##Appendix A
+### Appendix A
 
+Codes here will be published at a later date, once a proper format has been established.
 <!--- Random code testing --->
+
 ```{r, include=FALSE}
 tesvariable <- 4
 anothertestvariable <- 6
@@ -109,7 +118,6 @@ attr(cv08$lftop, "labels")
 ```
 
 <!-- Changing educ3 and eslacht to proper labels and values-->
-
 
 ```{r, include=FALSE}
 cv08 <- mutate(.data = cv08, lftop_new = na_if(lftop, 99))
@@ -183,6 +191,7 @@ cv08 <- cv08 %>%
 ```
 
 <!-- Selecting the correct variables we want in our new cleaned data-set -->
+
 ```{r, include=FALSE}
 cv08_cleaned <- cv08 %>%
   dplyr::select(c("we_id", "lftop", "geslacht", "var006n", "v401", "landd"))
@@ -254,7 +263,8 @@ cv08_10_cleaned <- cv08_cleaned %>%
 ```
 
 <!-- Time to make it into a wide format? -->
-``` {r, include=F}
+
+```{r, include=F}
 psych::describe(cv08_10_cleaned)
 
 cv08_10_cleaned_wide <- full_join(cv08_cleaned, cv10_cleaned, by = "id2", suffix = c(".2008", ".2010"))
@@ -264,4 +274,4 @@ cv08_10_cleaned_wide <- full_join(cv08_cleaned, cv10_cleaned, by = "id2", suffix
 #this wasn't working, this is where I stopped :)
 
 ```
-
+::::
