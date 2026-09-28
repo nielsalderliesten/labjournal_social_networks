@@ -24,9 +24,9 @@ navbar:
     - text: "Manuscript"
       menu:
       - text: "Introduction"
-        href: introduction_manuscript.Rmd
+        href: introduction_manuscript.html
       - text: "Data"
-        href: datapreperation.Rmd
+        href: datapreperation.html
   right:
   - icon: fab fa-github
     href: https://nielsalderliesten.github.io/labjournal_social_networks/
