@@ -1,0 +1,22 @@
+---
+title: "introduction_manuscript"
+author: "Niels Alderliesten"
+date: "2026-09-21"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction (draft)
+
+The political landscape of Western Europe has undergone significant changes in the past twenty years following the emergence of new green parties and radical right parties (Mudde, 2014; Wal, 2025). Particularly in multi-party systems has electoral systems have become increasingly versatile, with populist radical right (PRR) parties increasingly shifting power dynamics and forcing mainstream parties to adapt to their presence (Mudde, 2014; Wal, 2025). Radical right-wing parties have arised as new coalition partners, with right-wing and radical right-wing parties converging on issues such as migration (de Lange, 2012).
+
+This paper introduces the Netherlands as a case of observation, understood as a highly fragmented party system due to its low registration required for elections, incenvatizing new parties to form and compete (De Lange, 2022; Otjes & De Lange, 2025). Within the Dutch party system, consensus, agreements and government coalitions have played a crucial role (Lijphart, 1998; Otjes & De Lange, 2025). traditionally, These government coalitions tended to be formed around the centre. However, since the 2000s, the Dutch party system has been in a state of flux (De Lange, 2018; Pellikaan et al., 2018; Pennings & Keman, 2008; Wal, 2025; Wijnen & van der Brug, 2026). Centre parties have been increasingly diverging (Van der Brug et al., 2009), right-wing parties moving further to the right, balbalbalablbaa, with some even concluding that the centre has lost it’s stabile position at the core or heart of the Dutch system (Wal, 2025). Despite these developments, studies on parliamentary voting in the Netherlands were absent between 1977 and 2011 (Louwerse et al., 2018). While there has been growing interest in analyzing the structural behaviour and dynamics of Dutch parties, for instance in the form of spatial modelling (e.g. Louwerse et al., 2018; [insert examples from Louwerse], an explicit social network approach has been scarce. <br>
+
+[Insert the benefits of an explicit social network approach, such as illuminating the strategies and consequences of previously formed ties, interdependencies). In this paper, I will analyze Dutch parliamentary voting and it’s structural changes, proposing the following two research questions:
+
+*To what extent is there segregation in co-voting among political parties? How has this developed over time*?
+
+*To what extent can co-voting segregation patterns be attributed to changes in ideological distance?*

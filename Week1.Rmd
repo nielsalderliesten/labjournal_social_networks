@@ -17,8 +17,9 @@ rgl::setupKnitr()
 
 ```{r klippy, echo=FALSE, include=TRUE}
 klippy::klippy(position = c('top', 'right'))
-#klippy::klippy(color = 'darkred')
-#klippy::klippy(tooltip_message = 'Click to copy', tooltip_success = 'Done')
+klippy::klippy(color = 'lightblue')
+klippy::klippy(tooltip_message = 'Click to copy', tooltip_success = 'Done')
+
 ```
 
 # Week 1
@@ -47,19 +48,20 @@ Explanatory question: *Does inter-party interaction on Twitter influence party c
 
 ## Papers
 
-The following two papers were selected to aid in answering the above formulated questions. 
+The following two papers were selected to aid in answering the above formulated questions.
 
-**"Twitter and divides in the Dutch parliament: social and political segregation in the following, \@-mentions and retweets networks"** [@tolsmatwitter]
+**"Twitter and divides in the Dutch parliament: social and political segregation in the following, \@-mentions and retweets networks"** [@tolsma2024]
 
 **Political Opinions and Offline Social Networks in a Swiss Student Community** [@mephamthesis]
-
 :::
 
 ## R Tutorial
 
-We were also asked to read and go through Appendix A and B of [@SNASS] I am currently still debating on how best to include this in the lab journal. This R tutorial section will therefore be updated on a later date.
+We were also asked to read and go through Appendix A and B of [@SNASS].
 
-```{r, include=FALSE}
+The necessary libraries:
+
+```{r}
 library(tidyverse)
 library(haven)
 
@@ -67,10 +69,9 @@ library(haven)
 
 ### Appendix A
 
-Codes here will be published at a later date, once a proper format has been established.
-<!--- Random code testing --->
+### Some initial code exploration
 
-```{r, include=FALSE}
+```{r, warning=FALSE}
 tesvariable <- 4
 anothertestvariable <- 6
 #look in your environment tab. You now see you have something there. 
@@ -88,9 +89,9 @@ ls()
 
 ```
 
-<!-- Loading folders, analyzing the data-frame -->
+### Loading folders, analyzing the data-frame
 
-```{r,include=FALSE}
+```{r,warning=FALSE}
 
 cv08 <- haven::read_sav(file = "Cultural_Changes_2008.sav")
 cv10 <- haven::read_sav(file = "Cultural_Changes_2010.sav")
@@ -106,7 +107,7 @@ attributes(cv08)
 
 ```
 
-```{r, include=FALSE}
+```{r, warning=FALSE}
 table(cv08$lftop, useNA = "always")
 cv08$lftop_new <- cv08$lftop
 cv08$lftop_new[cv08$lftop_new == 99] <- NA
@@ -117,9 +118,9 @@ attr(cv08$lftop, "labels")
 
 ```
 
-<!-- Changing educ3 and eslacht to proper labels and values-->
+### Changing educ3 and geslacht to proper labels and values
 
-```{r, include=FALSE}
+```{r}
 cv08 <- mutate(.data = cv08, lftop_new = na_if(lftop, 99))
 table(cv08$lftop_new, useNA = "always")
 
@@ -148,9 +149,9 @@ cv08 <- cv08 %>%
 
 ```
 
-<!-- Re-labelling int055 through int057-->
+Re-labelling int055-int057
 
-```{r, include=FALSE}
+```{r}
 attr(cv08$int055, "labels")
 attr(cv08$geslacht_n, "labels")
 
@@ -181,7 +182,12 @@ cv08 <- cv08 %>%
                                .default = NA),
          int055 = labelled(int057_n, labels = c('Zeer groot' = 4, 'Groot' = 3, 'Niet zo groot' = 2, 'Helemaal geen tegenstelling' = 1 )))
 
-#Calculating the mean, if amount of NA is smaller than 2
+```
+
+Calculating the mean, if amount of NA is smaller than 2
+
+```{r}
+
 
 cv08 <- cv08 %>%
   rowwise () %>%
@@ -190,9 +196,9 @@ cv08 <- cv08 %>%
 
 ```
 
-<!-- Selecting the correct variables we want in our new cleaned data-set -->
+Selecting the correct variables we want in our new cleaned data-set
 
-```{r, include=FALSE}
+```{r}
 cv08_cleaned <- cv08 %>%
   dplyr::select(c("we_id", "lftop", "geslacht", "var006n", "v401", "landd"))
 
@@ -201,7 +207,7 @@ cv10_cleaned <- cv10 %>%
 
 ```
 
-```{r, include=FALSE}
+```{r}
 names(cv08_cleaned) <- names(cv10_cleaned) <- c("id", "age", "sex", "educ", "health", "region")
 
 cv08_cleaned <- cv08_cleaned %>% mutate(age = na_if(age, 99))
@@ -262,9 +268,9 @@ cv08_10_cleaned <- cv08_cleaned %>%
 
 ```
 
-<!-- Time to make it into a wide format? -->
+Time to make it into a wide-format. Here, I encountered troubles with functions not working. Hence, I stopped here.
 
-```{r, include=F}
+```{r}
 psych::describe(cv08_10_cleaned)
 
 cv08_10_cleaned_wide <- full_join(cv08_cleaned, cv10_cleaned, by = "id2", suffix = c(".2008", ".2010"))

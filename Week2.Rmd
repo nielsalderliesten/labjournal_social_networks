@@ -3,6 +3,7 @@ title: "Week 2"
 author: "Niels Alderliesten"
 date: "2026-09-07"
 output: html_document
+bibliography: references.bib
 ---
 
 ```{r, globalsettings, echo=FALSE, warning=FALSE}
@@ -16,6 +17,12 @@ rgl::setupKnitr()
 
 ```
 
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy(position = c('top', 'right'))
+klippy::klippy(color = 'lightblue')
+klippy::klippy(tooltip_message = 'Click to copy', tooltip_success = 'Done')
+
+```
 
 # Week 2
 
@@ -23,11 +30,11 @@ rgl::setupKnitr()
 ::: {.column width="50%"}
 Last compiled on `r format(Sys.time(), '%B, %Y')`
 
-<!-- ## Descriptives Time! -->
+## Descriptives Time!
 
-<!-- Installing libraries) -->
+Installing libraries first ofcourse
 
-```{r, include=F}
+```{r}
 #install.packages("RSiena")
 #install.packages("igraph")
 
@@ -69,10 +76,76 @@ class(net1)
 
 ```
 
+## Updated Research Questions
+
+After discussion with Jochem Tolsma in class, I have decided to further venture into the available data of party co-voting.
+
+Based on this data, an interest was established in creating my own network where co-voting percentage on motions could be translated into (stronger or weaker) ties.
+
+The research questions, as well as accompanying papers, were therefore re-newed.
+
+### Research questions
+
+With this new (soon to be made) network structure, the following research questions were formulated:
+
+Descriptive question: *To what extent is there segregation in co-voting among political parties? How has this developed in the past 20 years?*
+
+Explanatory question: *To what extent can (development in) segregation in co-voting be attributed to ideological distance?*
+
+### Papers
+
+The following two papers were selected to aid in answering the above formulated questions.
+
+**"Twitter and divides in the Dutch parliament: social and political segregation in the following, \@-mentions and retweets networks"** [@tolsma2024]
+
+**"Polarisation in Dutch Parliamentary Voting: A Social Network Approach to Polarisation"** (Van der Wal)
+
+## Attribute list
+
+Data that might be useful:
+
+-   Tweede Kamer Open Data
+
+    <https://www.openkamer.org/stats/stemmingen/partijen/>
+
+```{r}
+library(rjson)
+#openkamerdata <- fromJSON(file = "openkamer-2026-09-13.json")
+
+```
+
+-   The Dutch Parliamentary Behaviour Dataset:
+
+    <https://research.rug.nl/en/publications/the-dutch-parliamentary-behaviour-dataset/>
+
+```{r, results=TRUE}
+#library(dutchparl)
+#library(R.filesets)
+
+
+#votes <- loadRDS("votes.rds") 
+#print(votesame(examplevotes))
+
+```
+
+Attributes:
+
+-   Political party ID
+-   Co-voting score of Party X with Party Y
+    -   Longitudinal
+    -   Including time point
+    -   Differentiation in topics?
+-   Ideological score of political parties measured
+    -   Longitudinal
+    -   Including time point
+    -   Differentiation in topics?
+-   Coalition/Opposition status
+    -   Longitudinal
+    -   Including time point
+
 ## Chapter 6 SNASS
 
-In chapter 6 of [@SNASS], we first start with analyzing **segregation**.
-
+In chapter 6 of [@SNASS], we first start with analyzing *segregation*.
 
 ```{r}
 library(RSiena)
@@ -99,7 +172,7 @@ class(net1) #See! They're a network now.
 
 ```
 
-I then use the package sna to calculate Moran's I. 'nacf' computes the sample network covariance/correlation for a specified variable. It is also possible to compute Moran's I with this, which I am  going to do now. 
+I then use the package sna to calculate Moran's I. 'nacf' computes the sample network covariance/correlation for a specified variable. It is also possible to compute Moran's I with this, which I am going to do now.
 
 ```{r}
 library(sna)
@@ -114,7 +187,7 @@ snam1[2] #0.4331431
 
 geodistances <- sna::geodist(net1, count.paths = T) #Counts the lengths of a geodesics? among nodes. I think basically it measures the shortest distance
 geodistances <- geodistances$gdist
-print(geodistances) #As you can see, INF is used for dissconnected nodes. THe rest i assume is path length
+print(geodistances) #As you can see, INF is used for dissconnected nodes. The rest i assume is path length
 
 #First we have to define a weight
 weights1 <- geodistances == 1
@@ -228,9 +301,9 @@ fMoran.I(drink[,1], scaled=F, weight=weights1, na.rm = T, rowstandardize = F)
 
 ```
 
-```{r}
+But now, let's calculate a correlation between ctor i and all the alters to whom it is connected (direct or indirectly) and where alters at a larger distances (longer shortest path lengths) are weighted less.
 
-#But now, let's calculate a correlation between ctor i and all the alters to whom it is connected (direct or indirectly) and where alters at a larger distances (longer shortest path lengths) are weighted less.
+```{r}
 
 #step 1 for each acter i determine the distances (shortest path lengths) to all other nodes in the network.
 #Set the distance to yourself as INf.
@@ -245,13 +318,10 @@ fMoran.I(drink[,1], scaled=F, weight=weights2, na.rm = T, rowstandardize = F)
 
 ```
 
+Time to test significance. Let's first generate random graphs. I could not get the code of 6.2 to work sadly. Therefore, I'm trying it out with Zachary
+
 ```{r}
 #My own question: How to count dyad and triad configurations?
-
-#Time to test significance. 
-#Let's first generate random graphs. I could not get the code of 6.2 to work sadly.
-
-#Trying it out with Zachary
 
 igraph::edge_density(zachary_g, loops=F)
 density <- round(edge_density(zachary_g), 2)
@@ -275,8 +345,10 @@ par(mfrow = c(1,2))
   abline(v = mean_distance(zachary_g, unconnected=T), col = "red", lwd=3)
 }
 
-#As you can see, Zachary has an above expected clustering. But the path length is extremely average. 
+
 ```
+
+As you can see, Zachary has an above expected clustering. But the path length is extremely average.
 
 ## Further descriptives
 
@@ -308,8 +380,10 @@ igraph::transitivity(zachary_g, type = c("localundirected"), isolates = c("NaN",
 #Betweenness
 igraph::betweenness(zachary_g, directed=F)
 
-#As you can see. Node 1, 33 and 34 have an extremely high degree, betweenness, but do not have a big transitivity index (which is logical if they are connected with a lot of people, there is bound to be less triads closed)
+
 ```
+
+As you can see. Node 1, 33 and 34 have an extremely high degree, betweenness, but do not have a big transitivity index (which is logical if they are connected with a lot of people, there is bound to be less triads closed)
 
 Diad & Triad descriptives
 
@@ -320,11 +394,19 @@ igraph::triad_census(zachary_g) #Same problem as with dyad_census. BUt it still 
 sna::triad.census(zachary_amat)
 
 #Either
-45/393 #= 0.1145038
+45 / (393+45) #= 0.1027397
 45 / (3971 + 1575 + 393) #= 0.007577033
 igraph::transitivity(zachary_g, type = c("global"), isolates = c("NaN", "zero")) # 0.2556818
 sna::gtrans(zachary_amat) #0.2556818
 #Conclusion: I do not know how to calculate transitivity
+
+igraph::transitivity(zachary_g, type = "global")
+sna::gtrans(zachary_amat)
+
+triad_g <- data.frame(sna::triad.census(zachary_amat))
+
+transitivity_g <- (3 * triad_g$X300)/(triad_g$X201 + 3 * triad_g$X300)
+transitivity_g
 
 ```
 
@@ -355,6 +437,10 @@ legend(x = -2, y = -1.5, c("Note: the position of nodes 1 and 34 have been alter
                          Jochem Toslam for visualisation purposes only. These changes do not \n
                          reflect network properties"), bty = "n", cex =0.8) #For some reason the legend does not show up
 
-
-
 ```
+:::
+
+
+
+
+::::

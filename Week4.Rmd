@@ -1,0 +1,460 @@
+---
+title: "Week4"
+author: "Niels Alderliesten"
+date: "2026-09-21"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r, globalsettings, warning=FALSE}
+library(knitr)
+library(styler)
+
+knitr::opts_chunk$set(echo = TRUE)
+opts_chunk$set(tidy.opts=list(width.cutoff=100),tidy=TRUE, warning = FALSE, message = FALSE,comment = "#>", cache=TRUE, class.source=c("test"), results='hold', class.output=c("test2"), cache.lazy= F, eval=F)
+options(width = 100)
+rgl::setupKnitr()
+
+```
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy(position = c('top', 'right'))
+klippy::klippy(color = 'lightblue')
+klippy::klippy(tooltip_message = 'Click to copy', tooltip_success = 'Done')
+
+```
+
+## Necessary libraries
+
+```{r}
+library(RSiena)
+library(igraph)
+library(tidyverse)
+library(igraph)
+```
+
+## Network Visualisation and Webscraping!
+
+Today, we will be learning how to make pretty graphs/visualisations (and
+perhaps webscraping)
+
+In order to make a good visualisation, it is necessary to know
+beforehand what you want to illustrate. In order to so, you must
+ofcourse know your data and your theory. Plot first before running
+RSiena. LOOK first to see if they are relevant. Afterwards, when you
+have your results and your conclusions, then make a graph to illustrate
+this to the readers.
+
+## Network Visualistions
+
+In the following section, one will see network visualisations and
+descriptives that were already (partially)
+
+### Loading it in.
+
+```{r}
+
+#Example with Zachary from igraph
+
+zachary_g <- make_graph("Zachary")
+plot(zachary_g)
+
+#Pretty, now let's make it an adjacancy matrix
+
+```
+
+``` {r}
+zachary_amat <- as_adjacency_matrix(zachary_g, type = "both", sparse = F)
+view(zachary_amat)
+
+#Let's check, are they actually undirected?
+isSymmetric(zachary_amat) 
+#Yes they are. 
+
+```
+
+What do we know based on this: Total 34 nodes. Undirected Ties.
+
+```{r}
+#NUmber of nodes
+igraph::vcount(zachary_g)
+#Number of edges
+igraph::ecount(zachary_g)
+#degree
+igraph::degree(zachary_g)
+  #pretty plot?
+  hist(degree(zachary_g), xlabs='indegree', mains= 'Histogram of indegree')
+  #Doesn't work quite yet I think
+
+#Transitivity
+igraph::transitivity(zachary_g, type = c("localundirected"), isolates = c("NaN", "zero"))
+
+#Betweenness
+igraph::betweenness(zachary_g, directed=F)
+
+```
+
+As you can see. Node 1, 33 and 34 have an extremely high degree,
+betweenness, but do not have a big transitivity index (which is logical
+if they are connected with a lot of people, there is bound to be less
+triads closed)
+
+### Diad & Triad descriptives
+
+```{r}
+igraph::dyad_census(zachary_g) #Would give the number of relationships, including whether it is mutual, assymmetric or non-existent. Therefore only works with directed graphs, which zachary_g is not :). It therefore only gives mutual and null, not asymmetical etc.
+
+igraph::triad_census(zachary_g) #Same problem as with dyad_census. BUt it still gives the amount of connections.
+sna::triad.census(zachary_amat)
+
+#Either
+45 / (393+45) #= 0.1027397
+45 / (3971 + 1575 + 393) #= 0.007577033
+igraph::transitivity(zachary_g, type = c("global"), isolates = c("NaN", "zero")) # 0.2556818
+sna::gtrans(zachary_amat) #0.2556818
+#Conclusion: I do not know how to calculate transitivity
+
+igraph::transitivity(zachary_g, type = "global")
+sna::gtrans(zachary_amat)
+
+triad_g <- data.frame(sna::triad.census(zachary_amat))
+
+transitivity_g <- (3 * triad_g$X300)/(triad_g$X201 + 3 * triad_g$X300)
+transitivity_g
+
+```
+
+Definition of transitivity is: hoeveel triads die gesloten zijn /
+(aantal dat gesloten zijn + gesloten kunnen worden) Why do you have to
+do \* 3? Because a triad can be closed for three egos. This is different
+than with local transitivity, which measures transitivity on an
+ego-level, how connected are the people I am connected with (to
+eachother). Ego can have higher local transitivity.
+
+Verder nadenken: Global repricocity werkt hetzelfde (bij directed kan
+dat alleen, is wel allemaal moeilijker), waarbij je het \*2 moet doen
+i.p.v. 3.
+
+Conclusie dus: 1 en 34 zijn niet met elkaar verbonden. Hebben een hoge
+mate van betweenness, maar een lage mate van transitivity. Let's
+visualise this!
+
+### Network Visualisation
+
+To alter the visuals/characteristics of graph: V = vertice
+(characteristics of nodes) E = edge (characteristics of relations)
+
+```{r}
+plot(zachary_g)
+#Let's make those with a larger betweeness, also larger in the graph
+
+V(zachary_g)$size = betweenness(zachary_g, normalized = T, directed = F) * 60 + 10 #*70 refers to the size of the larger betweeness (you are weighing the betweenness 60 times more), while the +15 refers to the size of the other nodes, the minimal grootte is 15. 
+#Make the size of plots consistent. Define the plot size beforehand. Turn this into a png, then see if it is correct. 
+plot(zachary_g)
+
+#Make them further apart!
+set.seed(2345)
+layout1 <- layout_with_mds(zachary_g)
+plot(zachary_g, layout=layout1)
+
+#We change the coordinates of the nodes in the new layout we created
+layout1
+layout1[1, 1] <- 4 #THe x axis of node 1 is now further to the right
+layout1[34, 1] <- -4
+plot(zachary_g, layout=layout1)
+
+#Let's add a note for transparancy sake (as we altered the coordination of two nodes)
+#Is this really the same as statistically changing something? 
+plot(zachary_g, layout=layout1, margin = c(0,0,0,0))
+legend(x = -2, y = -1.5, c("Note: the position of nodes 1 and 34 have been altered by Niels Alderliesten \n and
+                         Jochem Toslam for visualisation purposes only. These changes do not \n
+                         reflect network properties"), bty = "n", cex =0.8) #For some reason the legend does not show up
+
+
+
+```
+
+The question now remains, is the visualisation of the network this way
+ethical? Or is it data-manipulation? Up to you to decice, gray area.
+Images are not neutral, think about that. Either way, disclose it.
+
+## Webscraping
+
+Webscraping, in essence, is gathering/fishing/scraping information from
+internet. This can be done automatically or manually. Webscraping is not
+the same as Data-sharing also exists, where people can give their
+Whatsapp information for instance (who did you message, not content of
+message)
+
+**Benefits**:
+
+-   Actual observed behaviour.
+
+-   Cheap for large-scale research.
+
+-   Time/geo stamped.
+
+**Limitations**:
+
+-   More complex analysis (more in-depth data, more difficult it is to
+    analyze)
+
+-   Selectivity of posts
+
+-   Sampling
+
+**Ethics**:
+
+-   Is it allowed by the author/owner of data?
+
+-   Is it allowed by the law?
+
+-   Is it allowed by myself? Do I find it ethical?
+
+-   Is it allowed by the ethical commission of your research institute
+
+**APIs**
+
+Aplication Programming Interface: Websites that allow/are designed for
+webscraping.
+
+**Crawling** 
+What we are going to do.
+
+**Required libaries**
+```{r}
+######################################### Title: Webscraping in R Author: Bas Hofstra Version:
+######################################### 29-07-2021
+
+# start with clean workspace
+rm(list = ls())
+
+# install.packages('data.table')
+library(data.table)  # mainly for faster data handling
+library(tidyverse)  # I assume you already installed this one!
+# install.packages('httr') # we don't need this for now require(httr)
+install.packages("xml2")
+require(xml2)
+install.packages("rvest")
+require(rvest)
+install.packages("devtools")
+require(devtools)
+# Note we're doing something different here. We're installing a *latest* version directly from
+# GitHub This is because the released version of this packages contains some errors!
+devtools::install_github("jkeirstead/scholar")
+
+require(scholar)
+
+# define workdirectory, note the double *backslashes* if you're on windows setwd('/yourpathhere)'
+```
+
+```{r}
+url <- "https://nos.nl/zoeken?q=jochem+tolsma&page=1"
+
+nos <- rvest::read_html(url)
+
+nos
+
+nos %>% rvest::html_elements("main")
+#Nu maakt hij een xml nodeset. Hierna gaan we steeds dieper.
+
+
+lijst <- nos %>% rvest::html_elements("main") %>%
+  html_elements("ul") %>% #Want ul was de volgende set.
+  html_elements("li") #Dan wil ik nu verder naar de lists, waar die artikelen van de zoekopdracht stonden
+
+lijst[1] %>% html_children() #Onderliggende elements kan je ook m,et children doen. Zoals je kunt zien zit hier weer die <a in. In die <a willen we de href hebben.
+
+lijst[1] %>% html_children %>% html_attr(name="href") #Met attr halen de attributes van dat element eruit, met name kan je weer in die functie specificeren wat je eruit haalt. 
+
+
+```
+Hoe specifieker je wordt, hoe groter de kans dat als de website verandert, je de weg kwijt bent. 
+
+
+Haal href, datetime attr, en de tekst van datetime eruit. 
+
+```{r}
+artikel_partial <- nos %>% rvest::html_elements("main") %>%
+  html_elements("ul") %>% 
+  html_elements("li") %>%
+  html_elements("a")%>%
+  html_attr(name="href")
+
+artikellinks <- as.data.frame(paste0("https://nos.nl/", artikel_partial))
+
+artikeldatum <-  nos %>% rvest::html_elements("main") %>%
+  html_elements("ul") %>% 
+  html_elements("li") %>%
+  html_elements("a")%>%
+  html_element("time") %>%
+  html_attr(name="datetime") %>%
+  as.data.frame()
+
+artikeldatumtext <-  nos %>% rvest::html_elements("main") %>%
+  html_elements("ul") %>% 
+  html_elements("li") %>%
+  html_elements("a")%>%
+  html_element("time") %>%
+  html_text() %>%
+  as.data.frame()
+
+
+
+```
+
+Laten we het proberen met data van openkamer.org. 
+
+Update: Het adequaat installeren van de .json files was mij helaas niet gelukt.
+
+```{r, include =F}
+
+library(jsonlite)
+?jsonlite
+
+openkamer_fulldata <- fromJSON("C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/openkamer-2026-09-13.json")
+
+openkamer_fulldata_attempt2 <- fromJSON("C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/openkamer-2026-09-13.json", simplifyVector = T)
+
+
+?read_json
+
+class(openkamer_fulldata$fields)
+View(openkamer_fulldata$fields)
+
+parties <- which(!is.na(openkamer_fulldata$fields$party_name))
+parties
+
+View(openkamer_fulldata$fields$party_name)
+
+class(openkamer_fulldata)
+
+```
+
+## Homework: Pretty plot
+
+Behold, my attempt at a pretty plot with my own collected data:
+
+```{r}
+plot(g_schoof1)
+```
+```{r}
+
+edge_density(g_schoof1)
+#Density is 0.659
+
+igraph::vcount(g_schoof1)
+#Number of nodes = 14
+
+igraph::ecount(g_schoof1)
+#Number of edges is 120
+
+#degree
+igraph::degree(g_schoof1, mode = c("in"))
+#FVD has zero in-degrees
+igraph::degree(g_schoof1, mode = c("out"))
+#Denk has 11 out-degrees but only 5 indegrees
+igraph::degree(g_schoof1, mode = c("total"))
+#CU and D66 have high degree. 
+
+#Betweenness
+igraph::betweenness(g_schoof1, directed=T)
+#Of Note. D66 and CU have incredibly high betweenness score. 
+
+```
+
+As you can see. Node 1, 33 and 34 have an extremely high degree,
+betweenness, but do not have a big transitivity index (which is logical
+if they are connected with a lot of people, there is bound to be less
+triads closed)
+
+### Diad & Triad descriptives
+
+```{r}
+igraph::dyad_census(g_schoof1) 
+
+igraph::triad_census(g_schoof1) #Same problem as with dyad_census. BUt it still gives the amount of connections.
+
+
+
+igraph::transitivity(g_schoof1, type = "global")
+sna::gtrans(adj_schoof1)
+
+triad_g <- data.frame(sna::triad.census(adj_schoof1))
+table(triad_g)
+
+E(g_schoof1)$arrow.size = 0.4
+V(g_schoof1)$size = 10
+plot(g_schoof1)
+
+```
+
+``` {r}
+
+layout2 <- layout_with_mds(g_schoof1)
+
+layout2[1, 1] <- -(0.4)
+layout2[2, 1] <- +(2.67)
+layout2[3,1] <- + (0.75)
+layout2[4,1] <- +(4.84)
+layout2[5,1] <- +(4.84)
+layout2[6,1] <- +(2.75)
+layout2[7,1] <- -(1.11)
+layout2[8, 1] <- -(3.5)
+layout2[9,1] <- -(0.04)
+layout2[10,1] <- +(3)
+layout2[11,1] <- -(3.8)
+layout2[12,1] <- -(0.5)
+layout2[13,1] <- +(1.6)
+layout2[14,1] <- -(2.25)
+
+plot(g_schoof1, layout=layout2, vertex.size=15)
+
+V(g_schoof1)$size = degree(g_schoof1, mode="in") *1.5 
+plot(g_schoof1, layout=layout2)
+V(g_schoof1)$size = degree(g_schoof1, mode="out") *1.5 
+plot(g_schoof1, layout=layout2)
+
+clp <- cluster_optimal(g_schoof1)
+plot(clp, g_schoof1)
+
+partijenstemgedrag <- loadRDS("C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijenstemgedragdatalist.Rdata")
+```
+
+```{r}
+
+clpbalk <- cluster_optimal(g_balkenende4)
+plot(clpbalk, g_balkenende4)
+
+clprutte1 <- cluster_optimal(g_rutte1)
+plot(clprutte1, g_rutte1)
+
+clprutte2 <- cluster_optimal(g_rutte2)
+plot(clprutte2, g_rutte2)
+
+clprutte3 <- cluster_optimal(g_rutte3)
+plot(clprutte3, g_rutte3)
+
+clprutte4 <- cluster_optimal(g_rutte4)
+plot(clprutte4, g_rutte4)
+
+clp <- cluster_optimal(g_schoof1)
+plot(clp, g_schoof1)
+
+
+```
+
+```{r}
+
+plot(g_balkenende4)
+plot(g_rutte1)
+plot(g_rutte2)
+plot(g_rutte3)
+plot(g_rutte4)
+plot(g_schoof1)
+
+
+```
+
