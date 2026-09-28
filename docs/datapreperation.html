@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Niels Alderliesten" />
+
+<meta name="date" content="2026-09-21" />
+
+<title>voting_data_attempt</title>
+
+<script src="site_libs/header-attrs-2.31/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script src="site_libs/navigation-1.1/sourceembed.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+<style type="text/css">
+#rmd-source-code {
+  display: none;
+}
+</style>
+
+
+<link rel="stylesheet" href="tweaks.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Lab Journal
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Week1.html">Week 1</a>
+    </li>
+    <li>
+      <a href="Week2.html">Week 2</a>
+    </li>
+    <li>
+      <a href="Week3.html">Week 3</a>
+    </li>
+    <li>
+      <a href="Week4.html">Week 4</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Manuscript
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="introduction_manuscript.Rmd">Introduction</a>
+    </li>
+    <li>
+      <a href="datapreperation.Rmd">Data</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://nielsalderliesten.github.io/labjournal_social_networks/">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+<li role="separator" class="divider"></li>
+<li><a id="rmd-download-source" href="#">Download Rmd</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">voting_data_attempt</h1>
+<h4 class="author">Niels Alderliesten</h4>
+<h4 class="date">2026-09-21</h4>
+
+</div>
+
+
+<pre class="r"><code>library(RSiena)</code></pre>
+<pre><code>## Warning: package &#39;RSiena&#39; was built under R version 4.6.1</code></pre>
+<pre class="r"><code>library(igraph)</code></pre>
+<pre><code>## Warning: package &#39;igraph&#39; was built under R version 4.6.1</code></pre>
+<pre><code>## 
+## Attaching package: &#39;igraph&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     decompose, spectrum</code></pre>
+<pre><code>## The following object is masked from &#39;package:base&#39;:
+## 
+##     union</code></pre>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ✔ dplyr     1.2.1     ✔ readr     2.2.0
+## ✔ forcats   1.0.1     ✔ stringr   1.6.0
+## ✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+## ✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+## ✔ purrr     1.2.2</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ lubridate::%--%()      masks igraph::%--%()
+## ✖ dplyr::as_data_frame() masks tibble::as_data_frame(), igraph::as_data_frame()
+## ✖ purrr::compose()       masks igraph::compose()
+## ✖ tidyr::crossing()      masks igraph::crossing()
+## ✖ dplyr::filter()        masks stats::filter()
+## ✖ dplyr::lag()           masks stats::lag()
+## ✖ purrr::simplify()      masks igraph::simplify()
+## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+<pre class="r"><code>library(igraph)
+library(dutchparl)
+library(R.filesets)</code></pre>
+<pre><code>## Warning: package &#39;R.filesets&#39; was built under R version 4.6.1</code></pre>
+<pre><code>## Loading required package: R.oo</code></pre>
+<pre><code>## Warning: package &#39;R.oo&#39; was built under R version 4.6.1</code></pre>
+<pre><code>## Loading required package: R.methodsS3</code></pre>
+<pre><code>## Warning: package &#39;R.methodsS3&#39; was built under R version 4.6.1</code></pre>
+<pre><code>## R.methodsS3 v1.8.2 (2022-06-13 22:00:14 UTC) successfully loaded. See ?R.methodsS3 for help.
+## R.oo v1.27.1 (2025-05-02 21:00:05 UTC) successfully loaded. See ?R.oo for help.
+## 
+## Attaching package: &#39;R.oo&#39;
+## 
+## The following object is masked from &#39;package:R.methodsS3&#39;:
+## 
+##     throw
+## 
+## The following object is masked from &#39;package:igraph&#39;:
+## 
+##     hierarchy
+## 
+## The following objects are masked from &#39;package:methods&#39;:
+## 
+##     getClasses, getMethods
+## 
+## The following objects are masked from &#39;package:base&#39;:
+## 
+##     attach, detach, load, save
+## 
+## R.filesets v2.15.1 (2024-01-24 17:22:49 UTC) successfully loaded. See ?R.filesets for help.
+## 
+## Attaching package: &#39;R.filesets&#39;
+## 
+## The following object is masked from &#39;package:tidyr&#39;:
+## 
+##     extract
+## 
+## The following objects are masked from &#39;package:base&#39;:
+## 
+##     append, readLines</code></pre>
+<div id="some-initial-exploration-with-other-data-origins"
+class="section level2" number="1">
+<h2><span class="header-section-number">1</span> Some initial
+exploration with other data origins</h2>
+<div id="the-dutch-parliamentary-behaviour-dataset"
+class="section level3" number="1.1">
+<h3><span class="header-section-number">1.1</span> The Dutch
+Parliamentary Behaviour Dataset:</h3>
+<p><a
+href="https://research.rug.nl/en/publications/the-dutch-parliamentary-behaviour-dataset/"
+class="uri">https://research.rug.nl/en/publications/the-dutch-parliamentary-behaviour-dataset/</a></p>
+<pre class="r"><code>votes &lt;- loadRDS(&quot;C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/votes.rds&quot;)
+
+partyInfo&lt;- votes[[7]]
+
+party_name_short &lt;- partyInfo[[4]]
+
+party_name_short_df &lt;- as.data.frame(party_name_short)
+
+View(party_name_short_df)
+
+votesame(examplevotes)</code></pre>
+<pre><code>##                    CDA ChristenUnie       D66 GroenLinks      PvdA      PvdD
+## CDA          1.0000000    0.8852459 0.8032787  0.6229508 0.8852459 0.5901639
+## ChristenUnie 0.8852459    1.0000000 0.7868852  0.7049180 0.8360656 0.6721311
+## D66          0.8032787    0.7868852 1.0000000  0.8196721 0.8524590 0.7213115
+## GroenLinks   0.6229508    0.7049180 0.8196721  1.0000000 0.7377049 0.8688525
+## PvdA         0.8852459    0.8360656 0.8524590  0.7377049 1.0000000 0.7049180
+## PvdD         0.5901639    0.6721311 0.7213115  0.8688525 0.7049180 1.0000000
+## PVV          0.4426230    0.3934426 0.4754098  0.3934426 0.4262295 0.3606557
+## SGP          0.7049180    0.7213115 0.5737705  0.6557377 0.6885246 0.5573770
+## SP           0.5901639    0.6065574 0.6885246  0.8360656 0.6721311 0.8032787
+## Verdonk      0.5245902    0.4754098 0.5573770  0.5409836 0.5409836 0.4754098
+## VVD          0.6393443    0.5901639 0.6065574  0.5245902 0.6229508 0.4590164
+##                    PVV       SGP        SP   Verdonk       VVD
+## CDA          0.4426230 0.7049180 0.5901639 0.5245902 0.6393443
+## ChristenUnie 0.3934426 0.7213115 0.6065574 0.4754098 0.5901639
+## D66          0.4754098 0.5737705 0.6885246 0.5573770 0.6065574
+## GroenLinks   0.3934426 0.6557377 0.8360656 0.5409836 0.5245902
+## PvdA         0.4262295 0.6885246 0.6721311 0.5409836 0.6229508
+## PvdD         0.3606557 0.5573770 0.8032787 0.4754098 0.4590164
+## PVV          1.0000000 0.5409836 0.3934426 0.7540984 0.7377049
+## SGP          0.5409836 1.0000000 0.5573770 0.5901639 0.7049180
+## SP           0.3934426 0.5573770 1.0000000 0.5409836 0.4590164
+## Verdonk      0.7540984 0.5901639 0.5409836 1.0000000 0.7868852
+## VVD          0.7377049 0.7049180 0.4590164 0.7868852 1.0000000</code></pre>
+<pre class="r"><code>?votesame</code></pre>
+<pre><code>## starting httpd help server ... done</code></pre>
+</div>
+<div id="setting-up-a-matrix-from-scratch-subsequently-removing-nas"
+class="section level3" number="1.2">
+<h3><span class="header-section-number">1.2</span> Setting up a matrix
+from scratch, subsequently removing NAs</h3>
+<pre class="r"><code>testm &lt;- matrix(NA, nrow=4, ncol=4)
+testm[1,1] &lt;- 0
+testm[1,2] &lt;- 1
+testm[1,3] &lt;- 0
+testm[1,4] &lt;- 1
+testm[2,1] &lt;- 1
+testm[2,4] &lt;- 0
+testm[3,4] &lt;- 1
+testm[3,3] &lt;- 1
+testm[3,2] &lt;- 0
+
+missingrow &lt;- rowSums(is.na(testm)) == nrow(testm)
+missingcol &lt;- colSums(is.na(testm)) == ncol(testm)
+
+totalmissing &lt;- which(missingrow &amp; missingcol) #Welke ontbreken compleet, welke zou je dus weg kunnen halen.
+
+which(missingrow)</code></pre>
+<pre><code>## [1] 4</code></pre>
+<pre class="r"><code>testm</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    0    1    0    1
+## [2,]    1   NA   NA    0
+## [3,]   NA    0    1    1
+## [4,]   NA   NA   NA   NA</code></pre>
+<pre class="r"><code>testm[which(missingrow),] &lt;- 0
+testm[, which(missingcol)] &lt;- 0
+
+missingrow</code></pre>
+<pre><code>## [1] FALSE FALSE FALSE  TRUE</code></pre>
+<pre class="r"><code>missingcol</code></pre>
+<pre><code>## [1] FALSE FALSE FALSE FALSE</code></pre>
+<pre class="r"><code>#Voor RSienna hij was 1.0 = speciale missing waarde. Hij kan wel genomineerd worden maar hij was er niet.
+#NA blijft als hij er volgende keer wel bij is</code></pre>
+</div>
+<div id="attempting-to-see-if-i-can-webscrape-one-value"
+class="section level3" number="1.3">
+<h3><span class="header-section-number">1.3</span> Attempting to see if
+I can webscrape ONE! value</h3>
+<pre class="r"><code>#schoof1_url &lt;- &quot;https://www.partijgedrag.nl/party-likeness&quot;
+#schoof1 &lt;- rvest::read_html(schoof1_url)
+
+#schoof1_thingy &lt;- schoof1 %&gt;% rvest::html_elements(&quot;body&quot;) %&gt;% html_elements(&quot;div&quot;) %&gt;% html_children() %&gt;%
+#  html_elements(&quot;main&quot;)
+
+
+#schoof1_thingy[2] %&gt;% html_children %&gt;% html_elements(&quot;main&quot;) %&gt;% html_children() %&gt;% html_children()
+  
+  
+  
+
+#  html_elements(&quot;table&quot;) %&gt;%
+#  html_elements(&quot;tbody&quot;) %&gt;% html_children
+
+#html_elements(schoof1, html\body\div[2]\div\main\div\div[3]\div\div[2]\div\table\tbody)</code></pre>
+<p>Tot nu toe nog niet gelukt helaas.</p>
+</div>
+</div>
+<div id="own-data" class="section level2" number="2">
+<h2><span class="header-section-number">2</span> Own Data</h2>
+<p>Data personally gathered from openkamer.org</p>
+<p><a href="https://www.openkamer.org/stats/stemmingen/partijen/"
+class="uri">https://www.openkamer.org/stats/stemmingen/partijen/</a></p>
+<p>As well as from the Chapell Hill Data</p>
+<div id="list-object" class="section level3" number="2.1">
+<h3><span class="header-section-number">2.1</span> List object</h3>
+<p>First, we create a list that will later function as a collection
+where we can place all data Note: It is not necessary to add all the
+sub-items already. These can also be added during the process. However I
+liked it, in order to keep overview of what needed to be done.</p>
+<pre class="r"><code>partijenstemgedrag &lt;- list(balkenende4 = list(NA, NA, NA, NA, NA, NA),
+                           rutte1 = list(NA, NA, NA, NA, NA, NA), 
+                           rutte2 = list(NA, NA, NA, NA, NA, NA), 
+                           rutte3 = list(NA, NA, NA, NA, NA, NA),
+                           rutte4 = list(NA, NA, NA, NA, NA, NA), 
+                           schoof1 = list(NA, NA, NA, NA, NA, NA))
+
+names(partijenstemgedrag$balkenende4) &lt;- c(&quot;votesbalk&quot;, &quot;originvotesbalk&quot;, &quot;adjvotesbalk&quot;, &quot;statsbalk&quot;, &quot;weights1balk&quot;, &quot;weights2balk&quot;)
+
+names(partijenstemgedrag$rutte1) &lt;- c(&quot;votesrutte1&quot;, &quot;originvotesrutte1&quot;, &quot;adjvotesrutte1&quot;, &quot;statsrutte1&quot;, &quot;weights1rutte1&quot;, &quot;weights2rutte1&quot;)
+
+names(partijenstemgedrag$rutte2) &lt;- c(&quot;votesrutte2&quot;, &quot;originvotesrutte2&quot;, &quot;adjvotesrutte2&quot;, &quot;statsrutte2&quot;, &quot;weights1rutte2&quot;, &quot;weights2rutte2&quot;)
+
+names(partijenstemgedrag$rutte3) &lt;- c(&quot;votesrutte3&quot;, &quot;originvotesrutte3&quot;, &quot;adjvotesrutte3&quot;, &quot;statsrutte3&quot;, &quot;weights1rutte3&quot;, &quot;weights2rutte3&quot;)
+
+names(partijenstemgedrag$rutte4) &lt;- c(&quot;votesrutte4&quot;, &quot;originvotesrutte4&quot;, &quot;adjvotesrutte4&quot;, &quot;statsrutte4&quot;, &quot;weights1rutte4&quot;, &quot;weights2rutte4&quot;)
+
+names(partijenstemgedrag$schoof1) &lt;- c(&quot;votesschoof1&quot;, &quot;originvotesschoof1&quot;, &quot;adjvotesschoof1&quot;, &quot;statsschoof1&quot;, &quot;weights1schoof1&quot;, &quot;weights2schoof1&quot;)</code></pre>
+</div>
+<div id="votes" class="section level3" number="2.2">
+<h3><span class="header-section-number">2.2</span> Votes</h3>
+<p>First, we download all the votes dataframes</p>
+<pre class="r"><code>library(readxl)
+
+df_balkenende4 &lt;- as.data.frame(readxl::read_excel(&quot;C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx&quot;, sheet = 1))
+
+df_rutte1 &lt;- as.data.frame(readxl::read_excel(&quot;C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx&quot;, sheet = 3))
+
+df_rutte2 &lt;- as.data.frame(readxl::read_excel(&quot;C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx&quot;, sheet = 5))
+
+df_rutte3 &lt;- as.data.frame(readxl::read_excel(&quot;C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx&quot;, sheet = 7))
+
+df_rutte4 &lt;- as.data.frame(readxl::read_excel(&quot;C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx&quot;, sheet = 9))
+
+df_schoof1 &lt;- as.data.frame(readxl::read_excel(&quot;C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx&quot;, sheet = 11))</code></pre>
+<p>Subsequently, we clean up the votes dataframes and make them ready
+(in the format of adjacency matrix)</p>
+<pre class="r"><code>rownames(df_balkenende4) &lt;- df_balkenende4[,1]
+
+df_balkenende4 &lt;- df_balkenende4[,-1]
+
+df_balkenende4[] &lt;- lapply(df_balkenende4, as.numeric)
+
+#Let&#39;s keep this one apart as well, just in case
+df_balkenende4_ruw &lt;- df_balkenende4
+
+df_balkenende4[] &lt;- lapply(df_balkenende4, function(x) ifelse(x&gt;.5, 1, x))
+df_balkenende4[] &lt;- lapply(df_balkenende4, function(x) ifelse(x&lt;=.5, 0, x))</code></pre>
+<pre class="r"><code>rownames(df_rutte1) &lt;- df_rutte1[,1]
+
+df_rutte1 &lt;- df_rutte1[,-1]
+
+df_rutte1[] &lt;- lapply(df_rutte1, as.numeric)
+
+df_rutte1_ruw &lt;- df_rutte1
+
+df_rutte1[] &lt;- lapply(df_rutte1, function(x) ifelse(x&gt;.5, 1, x))
+df_rutte1[] &lt;- lapply(df_rutte1, function(x) ifelse(x&lt;=.5, 0, x))</code></pre>
+<pre class="r"><code>rownames(df_rutte2) &lt;- df_rutte2[,1]
+
+df_rutte2 &lt;- df_rutte2[,-1]
+
+df_rutte2[] &lt;- lapply(df_rutte2, as.numeric)
+
+df_rutte2_ruw &lt;- df_rutte2
+
+df_rutte2[] &lt;- lapply(df_rutte2, function(x) ifelse(x&gt;.5, 1, x))
+df_rutte2[] &lt;- lapply(df_rutte2, function(x) ifelse(x&lt;=.5, 0, x))</code></pre>
+<pre class="r"><code>rownames(df_rutte3) &lt;- df_rutte3[,1]
+
+df_rutte3 &lt;- df_rutte3[,-1]
+
+df_rutte3[] &lt;- lapply(df_rutte3, as.numeric)
+
+df_rutte3_ruw &lt;- df_rutte3
+
+df_rutte3[] &lt;- lapply(df_rutte3, function(x) ifelse(x&gt;.5, 1, x))
+df_rutte3[] &lt;- lapply(df_rutte3, function(x) ifelse(x&lt;=.5, 0, x))</code></pre>
+<pre class="r"><code>rownames(df_rutte4) &lt;- df_rutte4[,1]
+
+df_rutte4 &lt;- df_rutte4[,-1]
+
+df_rutte4[] &lt;- lapply(df_rutte4, as.numeric)
+
+df_rutte4_ruw &lt;- df_rutte4
+
+df_rutte4[] &lt;- lapply(df_rutte4, function(x) ifelse(x&gt;.5, 1, x))
+df_rutte4[] &lt;- lapply(df_rutte4, function(x) ifelse(x&lt;=.5, 0, x))</code></pre>
+<pre class="r"><code>rownames(df_schoof1) &lt;- df_schoof1[,1]
+
+df_schoof1 &lt;- df_schoof1[,-1]
+
+df_schoof1[] &lt;- lapply(df_schoof1, as.numeric)
+
+df_schoof1_ruw &lt;- df_schoof1
+
+df_schoof1[] &lt;- lapply(df_schoof1, function(x) ifelse(x&gt;.5, 1, x))
+df_schoof1[] &lt;- lapply(df_schoof1, function(x) ifelse(x&lt;=.5, 0, x))</code></pre>
+<p>Fill in the slots for votes!</p>
+<pre class="r"><code>#balkenende4
+partijenstemgedrag$balkenende4$votesbalk &lt;- df_balkenende4
+partijenstemgedrag$balkenende4$originvotesbalk &lt;- df_balkenende4_ruw
+
+#Rutte1
+
+partijenstemgedrag$rutte1$votesrutte1 &lt;- df_rutte1
+partijenstemgedrag$rutte1$originvotesrutte1 &lt;- df_rutte1_ruw
+
+#Rutte2
+partijenstemgedrag$rutte2$votesrutte2 &lt;- df_rutte2
+partijenstemgedrag$rutte2$originvotesrutte2 &lt;- df_rutte2_ruw
+
+#Rutte3
+partijenstemgedrag$rutte3$votesrutte3 &lt;- df_rutte3
+partijenstemgedrag$rutte3$originvotesrutte3 &lt;- df_rutte3_ruw
+
+#Rutte4
+partijenstemgedrag$rutte4$votesrutte4 &lt;- df_rutte4
+partijenstemgedrag$rutte4$originvotesrutte4 &lt;- df_rutte4_ruw
+
+#Schoof1
+partijenstemgedrag$schoof1$votesschoof1 &lt;- df_schoof1
+partijenstemgedrag$schoof1$originvotesrutteschoof1 &lt;- df_schoof1_ruw</code></pre>
+</div>
+<div id="stats" class="section level3" number="2.3">
+<h3><span class="header-section-number">2.3</span> Stats!</h3>
+<p>First, we download the stats files</p>
+<pre class="r"><code>stats_balkenende4_df &lt;- as.data.frame(readxl::read_excel(&quot;C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx&quot;, sheet = 2))
+
+stats_rutte1_df &lt;- as.data.frame(readxl::read_excel(&quot;C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx&quot;, sheet = 4))
+
+stats_rutte2_df &lt;- as.data.frame(readxl::read_excel(&quot;C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx&quot;, sheet = 6))
+
+stats_rutte3_df &lt;- as.data.frame(readxl::read_excel(&quot;C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx&quot;, sheet = 8))
+
+stats_rutte4_df &lt;- as.data.frame(readxl::read_excel(&quot;C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx&quot;, sheet = 10))
+
+stats_schoof1_df &lt;- as.data.frame(readxl::read_excel(&quot;C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx&quot;, sheet = 12))</code></pre>
+<p>Subsequently, we clean up the stats dataframes and make them
+ready</p>
+<pre class="r"><code>rownames(stats_balkenende4_df) &lt;- stats_balkenende4_df[,1]
+
+stats_balkenende4_df &lt;- stats_balkenende4_df[,-1]
+
+stats_balkenende4_df$coalitie &lt;- as.factor(stats_balkenende4_df$coalitie)
+stats_balkenende4_df$oppositie &lt;- as.factor(stats_balkenende4_df$oppositie)
+
+stats_balkenende4_df$ch_ideologie &lt;- as.numeric(stats_balkenende4_df$ch_ideologie)</code></pre>
+<pre class="r"><code>rownames(stats_rutte1_df) &lt;- stats_rutte1_df[,1]
+
+stats_rutte1_df &lt;- stats_rutte1_df[,-1]
+
+stats_rutte1_df$coalitie &lt;- as.factor(stats_rutte1_df$coalitie)
+stats_rutte1_df$oppositie &lt;- as.factor(stats_rutte1_df$oppositie)
+
+stats_rutte1_df$ch_ideologie &lt;- as.numeric(stats_rutte1_df$ch_ideologie)</code></pre>
+<pre class="r"><code>rownames(stats_rutte2_df) &lt;- stats_rutte2_df[,1]
+
+stats_rutte2_df &lt;- stats_rutte2_df[,-1]
+
+stats_rutte2_df$coalitie &lt;- as.factor(stats_rutte2_df$coalitie)
+stats_rutte2_df$oppositie &lt;- as.factor(stats_rutte2_df$oppositie)
+
+stats_rutte2_df$ch_ideologie &lt;- as.numeric(stats_rutte2_df$ch_ideologie)</code></pre>
+<pre class="r"><code>rownames(stats_rutte3_df) &lt;- stats_rutte3_df[,1]
+
+stats_rutte3_df &lt;- stats_rutte3_df[,-1]
+
+stats_rutte3_df$coalitie &lt;- as.factor(stats_rutte3_df$coalitie)
+stats_rutte3_df$oppositie &lt;- as.factor(stats_rutte3_df$oppositie)
+
+stats_rutte3_df$ch_ideologie &lt;- as.numeric(stats_rutte3_df$ch_ideologie)</code></pre>
+<pre class="r"><code>rownames(stats_rutte4_df) &lt;- stats_rutte4_df[,1]
+
+stats_rutte4_df &lt;- stats_rutte4_df[,-1]
+
+stats_rutte4_df$coalitie &lt;- as.factor(stats_rutte4_df$coalitie)
+stats_rutte4_df$oppositie &lt;- as.factor(stats_rutte4_df$oppositie)
+
+stats_rutte4_df$ch_ideologie &lt;- as.numeric(stats_rutte4_df$ch_ideologie)</code></pre>
+<pre class="r"><code>rownames(stats_schoof1_df) &lt;- stats_schoof1_df[,1]
+
+stats_schoof1_df &lt;- stats_schoof1_df[,-1]
+
+stats_schoof1_df$coalitie &lt;- as.factor(stats_schoof1_df$coalitie)
+stats_schoof1_df$oppositie &lt;- as.factor(stats_schoof1_df$oppositie)
+
+stats_schoof1_df$ch_ideologie &lt;- as.numeric(stats_schoof1_df$ch_ideologie)</code></pre>
+<p>Fill in the slots for votes!</p>
+<pre class="r"><code>#balkenende4
+partijenstemgedrag$balkenende4$statsbalk &lt;- stats_balkenende4_df
+
+#Rutte1
+partijenstemgedrag$rutte1$statsrutte1 &lt;- stats_rutte1_df
+
+#Rutte2
+partijenstemgedrag$rutte2$statsrutte2 &lt;- stats_rutte2_df
+
+#Rutte3
+partijenstemgedrag$rutte3$statsrutte3 &lt;- stats_rutte3_df
+
+#Rutte4
+partijenstemgedrag$rutte4$statsrutte4 &lt;- stats_rutte4_df
+
+#Schoof1
+partijenstemgedrag$schoof1$statsschoof1 &lt;- stats_schoof1_df</code></pre>
+</div>
+<div id="adjacency-matrixes" class="section level3" number="2.4">
+<h3><span class="header-section-number">2.4</span> Adjacency
+matrixes</h3>
+<p>First, we create the adjacancy matrixes</p>
+<pre class="r"><code>#Turns out that R won&#39;t make an igraph (properly) if there are NAs in a matrix? Which is why I remove them. 
+
+adj_balkenende4 &lt;- as.matrix(df_balkenende4) %&gt;%
+  replace(is.na(.), 0)
+
+adj_rutte1 &lt;- as.matrix(df_rutte1) %&gt;%
+  replace(is.na(.), 0)
+
+adj_rutte2 &lt;- as.matrix(df_rutte2) %&gt;%
+  replace(is.na(.), 0)
+
+adj_rutte3 &lt;- as.matrix(df_rutte3) %&gt;%
+  replace(is.na(.), 0)
+
+adj_rutte4 &lt;- as.matrix(df_rutte4) %&gt;%
+  replace(is.na(.), 0)
+
+adj_schoof1 &lt;- as.matrix(df_schoof1) %&gt;%
+  replace(is.na(.), 0)</code></pre>
+<p>Then, we fill them in!</p>
+<pre class="r"><code>#balkenende4
+partijenstemgedrag$balkenende4$adjvotesbalk &lt;- adj_balkenende4
+
+#Rutte1
+partijenstemgedrag$rutte1$adjvotesrutte1 &lt;- adj_rutte1
+
+#Rutte2
+partijenstemgedrag$rutte2$adjvotesrutte2 &lt;- adj_rutte2
+
+#Rutte3
+partijenstemgedrag$rutte3$adjvotesrutte3 &lt;- adj_rutte3
+
+#Rutte4
+partijenstemgedrag$rutte4$adjvotesrutte4 &lt;- adj_rutte4
+
+#Schoof1
+partijenstemgedrag$schoof1$adjvotesschoof1 &lt;- adj_schoof1</code></pre>
+</div>
+<div id="graph" class="section level3" number="2.5">
+<h3><span class="header-section-number">2.5</span> Graph</h3>
+<p>Now you might be thinking, this object was not previously mentioned
+in the list. Even though you said said it was a good overview of
+everything that was going to be added on later……..Okay I lied, I added
+this section later on during the process but thought it was more
+efficient to just add this here :)</p>
+<p>First, we create the graphs</p>
+<pre class="r"><code>g_balkenende4 &lt;- graph_from_adjacency_matrix(adj_balkenende4, mode=c(&quot;directed&quot;), weighted = F, add.rownames = NA)
+
+g_rutte1 &lt;- graph_from_adjacency_matrix(adj_rutte1, mode=c(&quot;directed&quot;), weighted = F, add.rownames = NA)
+
+g_rutte2 &lt;- graph_from_adjacency_matrix(adj_rutte2, mode=c(&quot;directed&quot;), weighted = F, add.rownames = NA)
+
+g_rutte3 &lt;- graph_from_adjacency_matrix(adj_rutte3, mode=c(&quot;directed&quot;), weighted = F, add.rownames = NA)
+
+g_rutte4 &lt;- graph_from_adjacency_matrix(adj_rutte4, mode=c(&quot;directed&quot;), weighted = F, add.rownames = NA)
+
+g_schoof1 &lt;- graph_from_adjacency_matrix(adj_schoof1, mode = &quot;directed&quot;, weighted = F, add.rownames = NA)</code></pre>
+<p>Then, we <del>fill</del> …. <em>add</em> them in…</p>
+<pre class="r"><code>partijenstemgedrag$balkenende4$graphbalk &lt;- g_balkenende4
+partijenstemgedrag$rutte1$graphrutte1 &lt;- g_rutte1
+partijenstemgedrag$rutte2$graphrutte2 &lt;- g_rutte2
+partijenstemgedrag$rutte3$graphrutte3 &lt;- g_rutte3
+partijenstemgedrag$rutte4$graphrutte4 &lt;- g_rutte4
+partijenstemgedrag$schoof1$graphschoof1 &lt;- g_schoof1</code></pre>
+</div>
+<div id="weights" class="section level3" number="2.6">
+<h3><span class="header-section-number">2.6</span> Weights</h3>
+<p>Let’s add weights for whether co-voting is smaller than 50%, between
+50%-80% or 80%-100%.</p>
+<pre class="r"><code>balkenendeweights1 &lt;- df_balkenende4_ruw %&gt;%
+  replace(is.na(.), FALSE) %&gt;%
+  lapply(function(x) ifelse(x&gt;=.5, TRUE, FALSE)) %&gt;%
+  as.data.frame()
+
+balkenendeweights2 &lt;- df_balkenende4_ruw %&gt;%
+  replace(is.na(.), FALSE) %&gt;%
+  lapply(function(x) ifelse(x&gt;=.8, TRUE, FALSE)) %&gt;%
+  as.data.frame()</code></pre>
+<pre class="r"><code>rutte1weights1 &lt;- df_rutte1_ruw %&gt;%
+  replace(is.na(.), FALSE) %&gt;%
+  lapply(function(x) ifelse(x&gt;=.5, TRUE, FALSE)) %&gt;%
+  as.data.frame()
+
+rutte1weights2 &lt;- df_rutte1_ruw %&gt;%
+  replace(is.na(.), FALSE) %&gt;%
+  lapply(function(x) ifelse(x&gt;=.8, TRUE, FALSE)) %&gt;%
+  as.data.frame()</code></pre>
+<pre class="r"><code>rutte2weights1 &lt;- df_rutte2_ruw %&gt;%
+  replace(is.na(.), FALSE) %&gt;%
+  lapply(function(x) ifelse(x&gt;=.5, TRUE, FALSE)) %&gt;%
+  as.data.frame()
+
+rutte2weights2 &lt;- df_rutte2_ruw %&gt;%
+  replace(is.na(.), FALSE) %&gt;%
+  lapply(function(x) ifelse(x&gt;=.8, TRUE, FALSE)) %&gt;%
+  as.data.frame()</code></pre>
+<pre class="r"><code>rutte3weights1 &lt;- df_rutte3_ruw %&gt;%
+  replace(is.na(.), FALSE) %&gt;%
+  lapply(function(x) ifelse(x&gt;=.5, TRUE, FALSE)) %&gt;%
+  as.data.frame()
+
+rutte3weights2 &lt;- df_rutte3_ruw %&gt;%
+  replace(is.na(.), FALSE) %&gt;%
+  lapply(function(x) ifelse(x&gt;=.8, TRUE, FALSE)) %&gt;%
+  as.data.frame()</code></pre>
+<pre class="r"><code>rutte4weights1 &lt;- df_rutte4_ruw %&gt;%
+  replace(is.na(.), FALSE) %&gt;%
+  lapply(function(x) ifelse(x&gt;=.5, TRUE, FALSE)) %&gt;%
+  as.data.frame()
+
+rutte4weights2 &lt;- df_rutte4_ruw %&gt;%
+  replace(is.na(.), FALSE) %&gt;%
+  lapply(function(x) ifelse(x&gt;=.8, TRUE, FALSE)) %&gt;%
+  as.data.frame()</code></pre>
+<pre class="r"><code>schoof1weights1 &lt;- df_schoof1_ruw %&gt;%
+  replace(is.na(.), FALSE) %&gt;%
+  lapply(function(x) ifelse(x&gt;=.5, TRUE, FALSE)) %&gt;%
+  as.data.frame()
+
+schoof1weights2 &lt;- df_schoof1_ruw %&gt;%
+  replace(is.na(.), FALSE) %&gt;%
+  lapply(function(x) ifelse(x&gt;=.8, TRUE, FALSE)) %&gt;%
+  as.data.frame()</code></pre>
+<p>Let’s put them in the list as well!</p>
+<pre class="r"><code>#balkenende4
+partijenstemgedrag$balkenende4$weights1balk &lt;- balkenendeweights1
+partijenstemgedrag$balkenende4$weights2balk &lt;- balkenendeweights2
+
+#Rutte1
+partijenstemgedrag$rutte1$weights1rutte1 &lt;- rutte1weights1
+partijenstemgedrag$rutte1$weights2rutte1 &lt;- rutte1weights2
+
+#Rutte2
+partijenstemgedrag$rutte2$weights1rutte2 &lt;- rutte2weights1
+partijenstemgedrag$rutte2$weights2rutte2 &lt;- rutte2weights2
+
+#Rutte3
+partijenstemgedrag$rutte3$weights1rutte3 &lt;- rutte3weights1
+partijenstemgedrag$rutte3$weights2rutte3 &lt;- rutte3weights2
+
+#Rutte4
+partijenstemgedrag$rutte4$weights1rutte4 &lt;- rutte4weights1
+partijenstemgedrag$rutte4$weights2rutte4 &lt;- rutte4weights2
+
+#Schoof1
+partijenstemgedrag$schoof1$weights1schoof1 &lt;- schoof1weights1
+partijenstemgedrag$schoof1$weights2schoof1 &lt;- schoof1weights2</code></pre>
+</div>
+<div id="final-save" class="section level3" number="2.7">
+<h3><span class="header-section-number">2.7</span> Final save</h3>
+<p>Saving the list for potential transfer/download</p>
+<pre class="r"><code>saveRDS(partijenstemgedrag, &quot;C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijenstemgedragdatalist.Rdata&quot;)</code></pre>
+</div>
+</div>
+
+<div id="rmd-source-code">LS0tDQp0aXRsZTogInZvdGluZ19kYXRhX2F0dGVtcHQiDQphdXRob3I6ICJOaWVscyBBbGRlcmxpZXN0ZW4iDQpkYXRlOiAiMjAyNi0wOS0yMSINCm91dHB1dDogaHRtbF9kb2N1bWVudA0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0Ka25pdHI6Om9wdHNfY2h1bmskc2V0KGVjaG8gPSBUUlVFKQ0KYGBgDQoNCmBgYHtyfQ0KbGlicmFyeShSU2llbmEpDQpsaWJyYXJ5KGlncmFwaCkNCmxpYnJhcnkodGlkeXZlcnNlKQ0KbGlicmFyeShpZ3JhcGgpDQpsaWJyYXJ5KGR1dGNocGFybCkNCmxpYnJhcnkoUi5maWxlc2V0cykNCmBgYA0KDQojIyBTb21lIGluaXRpYWwgZXhwbG9yYXRpb24gd2l0aCBvdGhlciBkYXRhIG9yaWdpbnMNCg0KIyMjIFRoZSBEdXRjaCBQYXJsaWFtZW50YXJ5IEJlaGF2aW91ciBEYXRhc2V0Og0KDQo8aHR0cHM6Ly9yZXNlYXJjaC5ydWcubmwvZW4vcHVibGljYXRpb25zL3RoZS1kdXRjaC1wYXJsaWFtZW50YXJ5LWJlaGF2aW91ci1kYXRhc2V0Lz4NCg0KYGBge3IgfQ0Kdm90ZXMgPC0gbG9hZFJEUygiQzovVXNlcnMvbmllbHMvRG93bmxvYWRzL1JNU0NTL1llYXIgMi9Tb2NpYWwgTmV0d29ya3MvbGFiam91cm5hbF9zb2NpYWxfbmV0d29ya3MvZGF0YS92b3Rlcy5yZHMiKQ0KDQpwYXJ0eUluZm88LSB2b3Rlc1tbN11dDQoNCnBhcnR5X25hbWVfc2hvcnQgPC0gcGFydHlJbmZvW1s0XV0NCg0KcGFydHlfbmFtZV9zaG9ydF9kZiA8LSBhcy5kYXRhLmZyYW1lKHBhcnR5X25hbWVfc2hvcnQpDQoNClZpZXcocGFydHlfbmFtZV9zaG9ydF9kZikNCg0Kdm90ZXNhbWUoZXhhbXBsZXZvdGVzKQ0KDQo/dm90ZXNhbWUNCmBgYA0KDQojIyMgU2V0dGluZyB1cCBhIG1hdHJpeCBmcm9tIHNjcmF0Y2gsIHN1YnNlcXVlbnRseSByZW1vdmluZyBOQXMNCg0KYGBge3J9DQp0ZXN0bSA8LSBtYXRyaXgoTkEsIG5yb3c9NCwgbmNvbD00KQ0KdGVzdG1bMSwxXSA8LSAwDQp0ZXN0bVsxLDJdIDwtIDENCnRlc3RtWzEsM10gPC0gMA0KdGVzdG1bMSw0XSA8LSAxDQp0ZXN0bVsyLDFdIDwtIDENCnRlc3RtWzIsNF0gPC0gMA0KdGVzdG1bMyw0XSA8LSAxDQp0ZXN0bVszLDNdIDwtIDENCnRlc3RtWzMsMl0gPC0gMA0KDQptaXNzaW5ncm93IDwtIHJvd1N1bXMoaXMubmEodGVzdG0pKSA9PSBucm93KHRlc3RtKQ0KbWlzc2luZ2NvbCA8LSBjb2xTdW1zKGlzLm5hKHRlc3RtKSkgPT0gbmNvbCh0ZXN0bSkNCg0KdG90YWxtaXNzaW5nIDwtIHdoaWNoKG1pc3Npbmdyb3cgJiBtaXNzaW5nY29sKSAjV2Vsa2Ugb250YnJla2VuIGNvbXBsZWV0LCB3ZWxrZSB6b3UgamUgZHVzIHdlZyBrdW5uZW4gaGFsZW4uDQoNCndoaWNoKG1pc3Npbmdyb3cpDQp0ZXN0bQ0KdGVzdG1bd2hpY2gobWlzc2luZ3JvdyksXSA8LSAwDQp0ZXN0bVssIHdoaWNoKG1pc3Npbmdjb2wpXSA8LSAwDQoNCm1pc3Npbmdyb3cNCm1pc3Npbmdjb2wNCiNWb29yIFJTaWVubmEgaGlqIHdhcyAxLjAgPSBzcGVjaWFsZSBtaXNzaW5nIHdhYXJkZS4gSGlqIGthbiB3ZWwgZ2Vub21pbmVlcmQgd29yZGVuIG1hYXIgaGlqIHdhcyBlciBuaWV0Lg0KI05BIGJsaWpmdCBhbHMgaGlqIGVyIHZvbGdlbmRlIGtlZXIgd2VsIGJpaiBpcw0KDQpgYGANCg0KIyMjIEF0dGVtcHRpbmcgdG8gc2VlIGlmIEkgY2FuIHdlYnNjcmFwZSBPTkUhIHZhbHVlDQoNCmBgYHtyfQ0KI3NjaG9vZjFfdXJsIDwtICJodHRwczovL3d3dy5wYXJ0aWpnZWRyYWcubmwvcGFydHktbGlrZW5lc3MiDQojc2Nob29mMSA8LSBydmVzdDo6cmVhZF9odG1sKHNjaG9vZjFfdXJsKQ0KDQojc2Nob29mMV90aGluZ3kgPC0gc2Nob29mMSAlPiUgcnZlc3Q6Omh0bWxfZWxlbWVudHMoImJvZHkiKSAlPiUgaHRtbF9lbGVtZW50cygiZGl2IikgJT4lIGh0bWxfY2hpbGRyZW4oKSAlPiUNCiMgIGh0bWxfZWxlbWVudHMoIm1haW4iKQ0KDQoNCiNzY2hvb2YxX3RoaW5neVsyXSAlPiUgaHRtbF9jaGlsZHJlbiAlPiUgaHRtbF9lbGVtZW50cygibWFpbiIpICU+JSBodG1sX2NoaWxkcmVuKCkgJT4lIGh0bWxfY2hpbGRyZW4oKQ0KICANCiAgDQogIA0KDQojICBodG1sX2VsZW1lbnRzKCJ0YWJsZSIpICU+JQ0KIyAgaHRtbF9lbGVtZW50cygidGJvZHkiKSAlPiUgaHRtbF9jaGlsZHJlbg0KDQojaHRtbF9lbGVtZW50cyhzY2hvb2YxLCBodG1sXGJvZHlcZGl2WzJdXGRpdlxtYWluXGRpdlxkaXZbM11cZGl2XGRpdlsyXVxkaXZcdGFibGVcdGJvZHkpDQoNCmBgYA0KDQpUb3QgbnUgdG9lIG5vZyBuaWV0IGdlbHVrdCBoZWxhYXMuDQoNCiMjIE93biBEYXRhDQoNCkRhdGEgcGVyc29uYWxseSBnYXRoZXJlZCBmcm9tIG9wZW5rYW1lci5vcmcNCg0KPGh0dHBzOi8vd3d3Lm9wZW5rYW1lci5vcmcvc3RhdHMvc3RlbW1pbmdlbi9wYXJ0aWplbi8+DQoNCkFzIHdlbGwgYXMgZnJvbSB0aGUgQ2hhcGVsbCBIaWxsIERhdGENCg0KIyMjIExpc3Qgb2JqZWN0DQoNCkZpcnN0LCB3ZSBjcmVhdGUgYSBsaXN0IHRoYXQgd2lsbCBsYXRlciBmdW5jdGlvbiBhcyBhIGNvbGxlY3Rpb24gd2hlcmUgd2UgY2FuIHBsYWNlIGFsbCBkYXRhIE5vdGU6IEl0IGlzIG5vdCBuZWNlc3NhcnkgdG8gYWRkIGFsbCB0aGUgc3ViLWl0ZW1zIGFscmVhZHkuIFRoZXNlIGNhbiBhbHNvIGJlIGFkZGVkIGR1cmluZyB0aGUgcHJvY2Vzcy4gSG93ZXZlciBJIGxpa2VkIGl0LCBpbiBvcmRlciB0byBrZWVwIG92ZXJ2aWV3IG9mIHdoYXQgbmVlZGVkIHRvIGJlIGRvbmUuDQoNCmBgYHtyfQ0KcGFydGlqZW5zdGVtZ2VkcmFnIDwtIGxpc3QoYmFsa2VuZW5kZTQgPSBsaXN0KE5BLCBOQSwgTkEsIE5BLCBOQSwgTkEpLA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgcnV0dGUxID0gbGlzdChOQSwgTkEsIE5BLCBOQSwgTkEsIE5BKSwgDQogICAgICAgICAgICAgICAgICAgICAgICAgICBydXR0ZTIgPSBsaXN0KE5BLCBOQSwgTkEsIE5BLCBOQSwgTkEpLCANCiAgICAgICAgICAgICAgICAgICAgICAgICAgIHJ1dHRlMyA9IGxpc3QoTkEsIE5BLCBOQSwgTkEsIE5BLCBOQSksDQogICAgICAgICAgICAgICAgICAgICAgICAgICBydXR0ZTQgPSBsaXN0KE5BLCBOQSwgTkEsIE5BLCBOQSwgTkEpLCANCiAgICAgICAgICAgICAgICAgICAgICAgICAgIHNjaG9vZjEgPSBsaXN0KE5BLCBOQSwgTkEsIE5BLCBOQSwgTkEpKQ0KDQpuYW1lcyhwYXJ0aWplbnN0ZW1nZWRyYWckYmFsa2VuZW5kZTQpIDwtIGMoInZvdGVzYmFsayIsICJvcmlnaW52b3Rlc2JhbGsiLCAiYWRqdm90ZXNiYWxrIiwgInN0YXRzYmFsayIsICJ3ZWlnaHRzMWJhbGsiLCAid2VpZ2h0czJiYWxrIikNCg0KbmFtZXMocGFydGlqZW5zdGVtZ2VkcmFnJHJ1dHRlMSkgPC0gYygidm90ZXNydXR0ZTEiLCAib3JpZ2ludm90ZXNydXR0ZTEiLCAiYWRqdm90ZXNydXR0ZTEiLCAic3RhdHNydXR0ZTEiLCAid2VpZ2h0czFydXR0ZTEiLCAid2VpZ2h0czJydXR0ZTEiKQ0KDQpuYW1lcyhwYXJ0aWplbnN0ZW1nZWRyYWckcnV0dGUyKSA8LSBjKCJ2b3Rlc3J1dHRlMiIsICJvcmlnaW52b3Rlc3J1dHRlMiIsICJhZGp2b3Rlc3J1dHRlMiIsICJzdGF0c3J1dHRlMiIsICJ3ZWlnaHRzMXJ1dHRlMiIsICJ3ZWlnaHRzMnJ1dHRlMiIpDQoNCm5hbWVzKHBhcnRpamVuc3RlbWdlZHJhZyRydXR0ZTMpIDwtIGMoInZvdGVzcnV0dGUzIiwgIm9yaWdpbnZvdGVzcnV0dGUzIiwgImFkanZvdGVzcnV0dGUzIiwgInN0YXRzcnV0dGUzIiwgIndlaWdodHMxcnV0dGUzIiwgIndlaWdodHMycnV0dGUzIikNCg0KbmFtZXMocGFydGlqZW5zdGVtZ2VkcmFnJHJ1dHRlNCkgPC0gYygidm90ZXNydXR0ZTQiLCAib3JpZ2ludm90ZXNydXR0ZTQiLCAiYWRqdm90ZXNydXR0ZTQiLCAic3RhdHNydXR0ZTQiLCAid2VpZ2h0czFydXR0ZTQiLCAid2VpZ2h0czJydXR0ZTQiKQ0KDQpuYW1lcyhwYXJ0aWplbnN0ZW1nZWRyYWckc2Nob29mMSkgPC0gYygidm90ZXNzY2hvb2YxIiwgIm9yaWdpbnZvdGVzc2Nob29mMSIsICJhZGp2b3Rlc3NjaG9vZjEiLCAic3RhdHNzY2hvb2YxIiwgIndlaWdodHMxc2Nob29mMSIsICJ3ZWlnaHRzMnNjaG9vZjEiKQ0KDQpgYGANCg0KIyMjIFZvdGVzDQoNCkZpcnN0LCB3ZSBkb3dubG9hZCBhbGwgdGhlIHZvdGVzIGRhdGFmcmFtZXMNCg0KYGBge3J9DQpsaWJyYXJ5KHJlYWR4bCkNCg0KZGZfYmFsa2VuZW5kZTQgPC0gYXMuZGF0YS5mcmFtZShyZWFkeGw6OnJlYWRfZXhjZWwoIkM6L1VzZXJzL25pZWxzL0Rvd25sb2Fkcy9STVNDUy9ZZWFyIDIvU29jaWFsIE5ldHdvcmtzL2xhYmpvdXJuYWxfc29jaWFsX25ldHdvcmtzL2RhdGEvcGFydGlqZ2VkcmFnX2RhdGEueGxzeCIsIHNoZWV0ID0gMSkpDQoNCmRmX3J1dHRlMSA8LSBhcy5kYXRhLmZyYW1lKHJlYWR4bDo6cmVhZF9leGNlbCgiQzovVXNlcnMvbmllbHMvRG93bmxvYWRzL1JNU0NTL1llYXIgMi9Tb2NpYWwgTmV0d29ya3MvbGFiam91cm5hbF9zb2NpYWxfbmV0d29ya3MvZGF0YS9wYXJ0aWpnZWRyYWdfZGF0YS54bHN4Iiwgc2hlZXQgPSAzKSkNCg0KZGZfcnV0dGUyIDwtIGFzLmRhdGEuZnJhbWUocmVhZHhsOjpyZWFkX2V4Y2VsKCJDOi9Vc2Vycy9uaWVscy9Eb3dubG9hZHMvUk1TQ1MvWWVhciAyL1NvY2lhbCBOZXR3b3Jrcy9sYWJqb3VybmFsX3NvY2lhbF9uZXR3b3Jrcy9kYXRhL3BhcnRpamdlZHJhZ19kYXRhLnhsc3giLCBzaGVldCA9IDUpKQ0KDQpkZl9ydXR0ZTMgPC0gYXMuZGF0YS5mcmFtZShyZWFkeGw6OnJlYWRfZXhjZWwoIkM6L1VzZXJzL25pZWxzL0Rvd25sb2Fkcy9STVNDUy9ZZWFyIDIvU29jaWFsIE5ldHdvcmtzL2xhYmpvdXJuYWxfc29jaWFsX25ldHdvcmtzL2RhdGEvcGFydGlqZ2VkcmFnX2RhdGEueGxzeCIsIHNoZWV0ID0gNykpDQoNCmRmX3J1dHRlNCA8LSBhcy5kYXRhLmZyYW1lKHJlYWR4bDo6cmVhZF9leGNlbCgiQzovVXNlcnMvbmllbHMvRG93bmxvYWRzL1JNU0NTL1llYXIgMi9Tb2NpYWwgTmV0d29ya3MvbGFiam91cm5hbF9zb2NpYWxfbmV0d29ya3MvZGF0YS9wYXJ0aWpnZWRyYWdfZGF0YS54bHN4Iiwgc2hlZXQgPSA5KSkNCg0KZGZfc2Nob29mMSA8LSBhcy5kYXRhLmZyYW1lKHJlYWR4bDo6cmVhZF9leGNlbCgiQzovVXNlcnMvbmllbHMvRG93bmxvYWRzL1JNU0NTL1llYXIgMi9Tb2NpYWwgTmV0d29ya3MvbGFiam91cm5hbF9zb2NpYWxfbmV0d29ya3MvZGF0YS9wYXJ0aWpnZWRyYWdfZGF0YS54bHN4Iiwgc2hlZXQgPSAxMSkpDQoNCmBgYA0KDQpTdWJzZXF1ZW50bHksIHdlIGNsZWFuIHVwIHRoZSB2b3RlcyBkYXRhZnJhbWVzIGFuZCBtYWtlIHRoZW0gcmVhZHkgKGluIHRoZSBmb3JtYXQgb2YgYWRqYWNlbmN5IG1hdHJpeCkNCg0KYGBge3IsIHdhcm5pbmc9Rn0NCg0Kcm93bmFtZXMoZGZfYmFsa2VuZW5kZTQpIDwtIGRmX2JhbGtlbmVuZGU0WywxXQ0KDQpkZl9iYWxrZW5lbmRlNCA8LSBkZl9iYWxrZW5lbmRlNFssLTFdDQoNCmRmX2JhbGtlbmVuZGU0W10gPC0gbGFwcGx5KGRmX2JhbGtlbmVuZGU0LCBhcy5udW1lcmljKQ0KDQojTGV0J3Mga2VlcCB0aGlzIG9uZSBhcGFydCBhcyB3ZWxsLCBqdXN0IGluIGNhc2UNCmRmX2JhbGtlbmVuZGU0X3J1dyA8LSBkZl9iYWxrZW5lbmRlNA0KDQpkZl9iYWxrZW5lbmRlNFtdIDwtIGxhcHBseShkZl9iYWxrZW5lbmRlNCwgZnVuY3Rpb24oeCkgaWZlbHNlKHg+LjUsIDEsIHgpKQ0KZGZfYmFsa2VuZW5kZTRbXSA8LSBsYXBwbHkoZGZfYmFsa2VuZW5kZTQsIGZ1bmN0aW9uKHgpIGlmZWxzZSh4PD0uNSwgMCwgeCkpDQoNCmBgYA0KDQpgYGB7ciwgd2FybmluZz1GfQ0KDQpyb3duYW1lcyhkZl9ydXR0ZTEpIDwtIGRmX3J1dHRlMVssMV0NCg0KZGZfcnV0dGUxIDwtIGRmX3J1dHRlMVssLTFdDQoNCmRmX3J1dHRlMVtdIDwtIGxhcHBseShkZl9ydXR0ZTEsIGFzLm51bWVyaWMpDQoNCmRmX3J1dHRlMV9ydXcgPC0gZGZfcnV0dGUxDQoNCmRmX3J1dHRlMVtdIDwtIGxhcHBseShkZl9ydXR0ZTEsIGZ1bmN0aW9uKHgpIGlmZWxzZSh4Pi41LCAxLCB4KSkNCmRmX3J1dHRlMVtdIDwtIGxhcHBseShkZl9ydXR0ZTEsIGZ1bmN0aW9uKHgpIGlmZWxzZSh4PD0uNSwgMCwgeCkpDQoNCmBgYA0KDQpgYGB7ciwgd2FybmluZz1GfQ0KDQpyb3duYW1lcyhkZl9ydXR0ZTIpIDwtIGRmX3J1dHRlMlssMV0NCg0KZGZfcnV0dGUyIDwtIGRmX3J1dHRlMlssLTFdDQoNCmRmX3J1dHRlMltdIDwtIGxhcHBseShkZl9ydXR0ZTIsIGFzLm51bWVyaWMpDQoNCmRmX3J1dHRlMl9ydXcgPC0gZGZfcnV0dGUyDQoNCmRmX3J1dHRlMltdIDwtIGxhcHBseShkZl9ydXR0ZTIsIGZ1bmN0aW9uKHgpIGlmZWxzZSh4Pi41LCAxLCB4KSkNCmRmX3J1dHRlMltdIDwtIGxhcHBseShkZl9ydXR0ZTIsIGZ1bmN0aW9uKHgpIGlmZWxzZSh4PD0uNSwgMCwgeCkpDQoNCmBgYA0KDQpgYGB7ciwgd2FybmluZz1GfQ0KDQpyb3duYW1lcyhkZl9ydXR0ZTMpIDwtIGRmX3J1dHRlM1ssMV0NCg0KZGZfcnV0dGUzIDwtIGRmX3J1dHRlM1ssLTFdDQoNCmRmX3J1dHRlM1tdIDwtIGxhcHBseShkZl9ydXR0ZTMsIGFzLm51bWVyaWMpDQoNCmRmX3J1dHRlM19ydXcgPC0gZGZfcnV0dGUzDQoNCmRmX3J1dHRlM1tdIDwtIGxhcHBseShkZl9ydXR0ZTMsIGZ1bmN0aW9uKHgpIGlmZWxzZSh4Pi41LCAxLCB4KSkNCmRmX3J1dHRlM1tdIDwtIGxhcHBseShkZl9ydXR0ZTMsIGZ1bmN0aW9uKHgpIGlmZWxzZSh4PD0uNSwgMCwgeCkpDQoNCmBgYA0KDQpgYGB7ciwgd2FybmluZz1GfQ0KDQpyb3duYW1lcyhkZl9ydXR0ZTQpIDwtIGRmX3J1dHRlNFssMV0NCg0KZGZfcnV0dGU0IDwtIGRmX3J1dHRlNFssLTFdDQoNCmRmX3J1dHRlNFtdIDwtIGxhcHBseShkZl9ydXR0ZTQsIGFzLm51bWVyaWMpDQoNCmRmX3J1dHRlNF9ydXcgPC0gZGZfcnV0dGU0DQoNCmRmX3J1dHRlNFtdIDwtIGxhcHBseShkZl9ydXR0ZTQsIGZ1bmN0aW9uKHgpIGlmZWxzZSh4Pi41LCAxLCB4KSkNCmRmX3J1dHRlNFtdIDwtIGxhcHBseShkZl9ydXR0ZTQsIGZ1bmN0aW9uKHgpIGlmZWxzZSh4PD0uNSwgMCwgeCkpDQoNCmBgYA0KDQpgYGB7ciwgd2FybmluZz1GfQ0KDQpyb3duYW1lcyhkZl9zY2hvb2YxKSA8LSBkZl9zY2hvb2YxWywxXQ0KDQpkZl9zY2hvb2YxIDwtIGRmX3NjaG9vZjFbLC0xXQ0KDQpkZl9zY2hvb2YxW10gPC0gbGFwcGx5KGRmX3NjaG9vZjEsIGFzLm51bWVyaWMpDQoNCmRmX3NjaG9vZjFfcnV3IDwtIGRmX3NjaG9vZjENCg0KZGZfc2Nob29mMVtdIDwtIGxhcHBseShkZl9zY2hvb2YxLCBmdW5jdGlvbih4KSBpZmVsc2UoeD4uNSwgMSwgeCkpDQpkZl9zY2hvb2YxW10gPC0gbGFwcGx5KGRmX3NjaG9vZjEsIGZ1bmN0aW9uKHgpIGlmZWxzZSh4PD0uNSwgMCwgeCkpDQoNCmBgYA0KDQpGaWxsIGluIHRoZSBzbG90cyBmb3Igdm90ZXMhDQoNCmBgYHtyfQ0KDQojYmFsa2VuZW5kZTQNCnBhcnRpamVuc3RlbWdlZHJhZyRiYWxrZW5lbmRlNCR2b3Rlc2JhbGsgPC0gZGZfYmFsa2VuZW5kZTQNCnBhcnRpamVuc3RlbWdlZHJhZyRiYWxrZW5lbmRlNCRvcmlnaW52b3Rlc2JhbGsgPC0gZGZfYmFsa2VuZW5kZTRfcnV3DQoNCiNSdXR0ZTENCg0KcGFydGlqZW5zdGVtZ2VkcmFnJHJ1dHRlMSR2b3Rlc3J1dHRlMSA8LSBkZl9ydXR0ZTENCnBhcnRpamVuc3RlbWdlZHJhZyRydXR0ZTEkb3JpZ2ludm90ZXNydXR0ZTEgPC0gZGZfcnV0dGUxX3J1dw0KDQojUnV0dGUyDQpwYXJ0aWplbnN0ZW1nZWRyYWckcnV0dGUyJHZvdGVzcnV0dGUyIDwtIGRmX3J1dHRlMg0KcGFydGlqZW5zdGVtZ2VkcmFnJHJ1dHRlMiRvcmlnaW52b3Rlc3J1dHRlMiA8LSBkZl9ydXR0ZTJfcnV3DQoNCiNSdXR0ZTMNCnBhcnRpamVuc3RlbWdlZHJhZyRydXR0ZTMkdm90ZXNydXR0ZTMgPC0gZGZfcnV0dGUzDQpwYXJ0aWplbnN0ZW1nZWRyYWckcnV0dGUzJG9yaWdpbnZvdGVzcnV0dGUzIDwtIGRmX3J1dHRlM19ydXcNCg0KI1J1dHRlNA0KcGFydGlqZW5zdGVtZ2VkcmFnJHJ1dHRlNCR2b3Rlc3J1dHRlNCA8LSBkZl9ydXR0ZTQNCnBhcnRpamVuc3RlbWdlZHJhZyRydXR0ZTQkb3JpZ2ludm90ZXNydXR0ZTQgPC0gZGZfcnV0dGU0X3J1dw0KDQojU2Nob29mMQ0KcGFydGlqZW5zdGVtZ2VkcmFnJHNjaG9vZjEkdm90ZXNzY2hvb2YxIDwtIGRmX3NjaG9vZjENCnBhcnRpamVuc3RlbWdlZHJhZyRzY2hvb2YxJG9yaWdpbnZvdGVzcnV0dGVzY2hvb2YxIDwtIGRmX3NjaG9vZjFfcnV3DQoNCmBgYA0KDQojIyMgU3RhdHMhDQoNCkZpcnN0LCB3ZSBkb3dubG9hZCB0aGUgc3RhdHMgZmlsZXMNCg0KYGBge3J9DQoNCnN0YXRzX2JhbGtlbmVuZGU0X2RmIDwtIGFzLmRhdGEuZnJhbWUocmVhZHhsOjpyZWFkX2V4Y2VsKCJDOi9Vc2Vycy9uaWVscy9Eb3dubG9hZHMvUk1TQ1MvWWVhciAyL1NvY2lhbCBOZXR3b3Jrcy9sYWJqb3VybmFsX3NvY2lhbF9uZXR3b3Jrcy9kYXRhL3BhcnRpamdlZHJhZ19kYXRhLnhsc3giLCBzaGVldCA9IDIpKQ0KDQpzdGF0c19ydXR0ZTFfZGYgPC0gYXMuZGF0YS5mcmFtZShyZWFkeGw6OnJlYWRfZXhjZWwoIkM6L1VzZXJzL25pZWxzL0Rvd25sb2Fkcy9STVNDUy9ZZWFyIDIvU29jaWFsIE5ldHdvcmtzL2xhYmpvdXJuYWxfc29jaWFsX25ldHdvcmtzL2RhdGEvcGFydGlqZ2VkcmFnX2RhdGEueGxzeCIsIHNoZWV0ID0gNCkpDQoNCnN0YXRzX3J1dHRlMl9kZiA8LSBhcy5kYXRhLmZyYW1lKHJlYWR4bDo6cmVhZF9leGNlbCgiQzovVXNlcnMvbmllbHMvRG93bmxvYWRzL1JNU0NTL1llYXIgMi9Tb2NpYWwgTmV0d29ya3MvbGFiam91cm5hbF9zb2NpYWxfbmV0d29ya3MvZGF0YS9wYXJ0aWpnZWRyYWdfZGF0YS54bHN4Iiwgc2hlZXQgPSA2KSkNCg0Kc3RhdHNfcnV0dGUzX2RmIDwtIGFzLmRhdGEuZnJhbWUocmVhZHhsOjpyZWFkX2V4Y2VsKCJDOi9Vc2Vycy9uaWVscy9Eb3dubG9hZHMvUk1TQ1MvWWVhciAyL1NvY2lhbCBOZXR3b3Jrcy9sYWJqb3VybmFsX3NvY2lhbF9uZXR3b3Jrcy9kYXRhL3BhcnRpamdlZHJhZ19kYXRhLnhsc3giLCBzaGVldCA9IDgpKQ0KDQpzdGF0c19ydXR0ZTRfZGYgPC0gYXMuZGF0YS5mcmFtZShyZWFkeGw6OnJlYWRfZXhjZWwoIkM6L1VzZXJzL25pZWxzL0Rvd25sb2Fkcy9STVNDUy9ZZWFyIDIvU29jaWFsIE5ldHdvcmtzL2xhYmpvdXJuYWxfc29jaWFsX25ldHdvcmtzL2RhdGEvcGFydGlqZ2VkcmFnX2RhdGEueGxzeCIsIHNoZWV0ID0gMTApKQ0KDQpzdGF0c19zY2hvb2YxX2RmIDwtIGFzLmRhdGEuZnJhbWUocmVhZHhsOjpyZWFkX2V4Y2VsKCJDOi9Vc2Vycy9uaWVscy9Eb3dubG9hZHMvUk1TQ1MvWWVhciAyL1NvY2lhbCBOZXR3b3Jrcy9sYWJqb3VybmFsX3NvY2lhbF9uZXR3b3Jrcy9kYXRhL3BhcnRpamdlZHJhZ19kYXRhLnhsc3giLCBzaGVldCA9IDEyKSkNCg0KYGBgDQoNClN1YnNlcXVlbnRseSwgd2UgY2xlYW4gdXAgdGhlIHN0YXRzIGRhdGFmcmFtZXMgYW5kIG1ha2UgdGhlbSByZWFkeQ0KDQpgYGB7ciwgd2FybmluZz1GfQ0KDQpyb3duYW1lcyhzdGF0c19iYWxrZW5lbmRlNF9kZikgPC0gc3RhdHNfYmFsa2VuZW5kZTRfZGZbLDFdDQoNCnN0YXRzX2JhbGtlbmVuZGU0X2RmIDwtIHN0YXRzX2JhbGtlbmVuZGU0X2RmWywtMV0NCg0Kc3RhdHNfYmFsa2VuZW5kZTRfZGYkY29hbGl0aWUgPC0gYXMuZmFjdG9yKHN0YXRzX2JhbGtlbmVuZGU0X2RmJGNvYWxpdGllKQ0Kc3RhdHNfYmFsa2VuZW5kZTRfZGYkb3Bwb3NpdGllIDwtIGFzLmZhY3RvcihzdGF0c19iYWxrZW5lbmRlNF9kZiRvcHBvc2l0aWUpDQoNCnN0YXRzX2JhbGtlbmVuZGU0X2RmJGNoX2lkZW9sb2dpZSA8LSBhcy5udW1lcmljKHN0YXRzX2JhbGtlbmVuZGU0X2RmJGNoX2lkZW9sb2dpZSkNCg0KDQpgYGANCg0KYGBge3IsIHdhcm5pbmc9Rn0NCg0Kcm93bmFtZXMoc3RhdHNfcnV0dGUxX2RmKSA8LSBzdGF0c19ydXR0ZTFfZGZbLDFdDQoNCnN0YXRzX3J1dHRlMV9kZiA8LSBzdGF0c19ydXR0ZTFfZGZbLC0xXQ0KDQpzdGF0c19ydXR0ZTFfZGYkY29hbGl0aWUgPC0gYXMuZmFjdG9yKHN0YXRzX3J1dHRlMV9kZiRjb2FsaXRpZSkNCnN0YXRzX3J1dHRlMV9kZiRvcHBvc2l0aWUgPC0gYXMuZmFjdG9yKHN0YXRzX3J1dHRlMV9kZiRvcHBvc2l0aWUpDQoNCnN0YXRzX3J1dHRlMV9kZiRjaF9pZGVvbG9naWUgPC0gYXMubnVtZXJpYyhzdGF0c19ydXR0ZTFfZGYkY2hfaWRlb2xvZ2llKQ0KDQoNCmBgYA0KDQpgYGB7ciwgd2FybmluZz1GfQ0KDQpyb3duYW1lcyhzdGF0c19ydXR0ZTJfZGYpIDwtIHN0YXRzX3J1dHRlMl9kZlssMV0NCg0Kc3RhdHNfcnV0dGUyX2RmIDwtIHN0YXRzX3J1dHRlMl9kZlssLTFdDQoNCnN0YXRzX3J1dHRlMl9kZiRjb2FsaXRpZSA8LSBhcy5mYWN0b3Ioc3RhdHNfcnV0dGUyX2RmJGNvYWxpdGllKQ0Kc3RhdHNfcnV0dGUyX2RmJG9wcG9zaXRpZSA8LSBhcy5mYWN0b3Ioc3RhdHNfcnV0dGUyX2RmJG9wcG9zaXRpZSkNCg0Kc3RhdHNfcnV0dGUyX2RmJGNoX2lkZW9sb2dpZSA8LSBhcy5udW1lcmljKHN0YXRzX3J1dHRlMl9kZiRjaF9pZGVvbG9naWUpDQoNCg0KYGBgDQoNCmBgYHtyLCB3YXJuaW5nPUZ9DQoNCnJvd25hbWVzKHN0YXRzX3J1dHRlM19kZikgPC0gc3RhdHNfcnV0dGUzX2RmWywxXQ0KDQpzdGF0c19ydXR0ZTNfZGYgPC0gc3RhdHNfcnV0dGUzX2RmWywtMV0NCg0Kc3RhdHNfcnV0dGUzX2RmJGNvYWxpdGllIDwtIGFzLmZhY3RvcihzdGF0c19ydXR0ZTNfZGYkY29hbGl0aWUpDQpzdGF0c19ydXR0ZTNfZGYkb3Bwb3NpdGllIDwtIGFzLmZhY3RvcihzdGF0c19ydXR0ZTNfZGYkb3Bwb3NpdGllKQ0KDQpzdGF0c19ydXR0ZTNfZGYkY2hfaWRlb2xvZ2llIDwtIGFzLm51bWVyaWMoc3RhdHNfcnV0dGUzX2RmJGNoX2lkZW9sb2dpZSkNCg0KYGBgDQoNCmBgYHtyLCB3YXJuaW5nPUZ9DQoNCnJvd25hbWVzKHN0YXRzX3J1dHRlNF9kZikgPC0gc3RhdHNfcnV0dGU0X2RmWywxXQ0KDQpzdGF0c19ydXR0ZTRfZGYgPC0gc3RhdHNfcnV0dGU0X2RmWywtMV0NCg0Kc3RhdHNfcnV0dGU0X2RmJGNvYWxpdGllIDwtIGFzLmZhY3RvcihzdGF0c19ydXR0ZTRfZGYkY29hbGl0aWUpDQpzdGF0c19ydXR0ZTRfZGYkb3Bwb3NpdGllIDwtIGFzLmZhY3RvcihzdGF0c19ydXR0ZTRfZGYkb3Bwb3NpdGllKQ0KDQpzdGF0c19ydXR0ZTRfZGYkY2hfaWRlb2xvZ2llIDwtIGFzLm51bWVyaWMoc3RhdHNfcnV0dGU0X2RmJGNoX2lkZW9sb2dpZSkNCg0KYGBgDQoNCmBgYHtyLCB3YXJuaW5nPUZ9DQoNCnJvd25hbWVzKHN0YXRzX3NjaG9vZjFfZGYpIDwtIHN0YXRzX3NjaG9vZjFfZGZbLDFdDQoNCnN0YXRzX3NjaG9vZjFfZGYgPC0gc3RhdHNfc2Nob29mMV9kZlssLTFdDQoNCnN0YXRzX3NjaG9vZjFfZGYkY29hbGl0aWUgPC0gYXMuZmFjdG9yKHN0YXRzX3NjaG9vZjFfZGYkY29hbGl0aWUpDQpzdGF0c19zY2hvb2YxX2RmJG9wcG9zaXRpZSA8LSBhcy5mYWN0b3Ioc3RhdHNfc2Nob29mMV9kZiRvcHBvc2l0aWUpDQoNCnN0YXRzX3NjaG9vZjFfZGYkY2hfaWRlb2xvZ2llIDwtIGFzLm51bWVyaWMoc3RhdHNfc2Nob29mMV9kZiRjaF9pZGVvbG9naWUpDQoNCmBgYA0KDQpGaWxsIGluIHRoZSBzbG90cyBmb3Igdm90ZXMhDQoNCmBgYHtyfQ0KDQojYmFsa2VuZW5kZTQNCnBhcnRpamVuc3RlbWdlZHJhZyRiYWxrZW5lbmRlNCRzdGF0c2JhbGsgPC0gc3RhdHNfYmFsa2VuZW5kZTRfZGYNCg0KI1J1dHRlMQ0KcGFydGlqZW5zdGVtZ2VkcmFnJHJ1dHRlMSRzdGF0c3J1dHRlMSA8LSBzdGF0c19ydXR0ZTFfZGYNCg0KI1J1dHRlMg0KcGFydGlqZW5zdGVtZ2VkcmFnJHJ1dHRlMiRzdGF0c3J1dHRlMiA8LSBzdGF0c19ydXR0ZTJfZGYNCg0KI1J1dHRlMw0KcGFydGlqZW5zdGVtZ2VkcmFnJHJ1dHRlMyRzdGF0c3J1dHRlMyA8LSBzdGF0c19ydXR0ZTNfZGYNCg0KI1J1dHRlNA0KcGFydGlqZW5zdGVtZ2VkcmFnJHJ1dHRlNCRzdGF0c3J1dHRlNCA8LSBzdGF0c19ydXR0ZTRfZGYNCg0KI1NjaG9vZjENCnBhcnRpamVuc3RlbWdlZHJhZyRzY2hvb2YxJHN0YXRzc2Nob29mMSA8LSBzdGF0c19zY2hvb2YxX2RmDQoNCmBgYA0KDQojIyMgQWRqYWNlbmN5IG1hdHJpeGVzDQoNCkZpcnN0LCB3ZSBjcmVhdGUgdGhlIGFkamFjYW5jeSBtYXRyaXhlcw0KDQpgYGB7cn0NCg0KI1R1cm5zIG91dCB0aGF0IFIgd29uJ3QgbWFrZSBhbiBpZ3JhcGggKHByb3Blcmx5KSBpZiB0aGVyZSBhcmUgTkFzIGluIGEgbWF0cml4PyBXaGljaCBpcyB3aHkgSSByZW1vdmUgdGhlbS4gDQoNCmFkal9iYWxrZW5lbmRlNCA8LSBhcy5tYXRyaXgoZGZfYmFsa2VuZW5kZTQpICU+JQ0KICByZXBsYWNlKGlzLm5hKC4pLCAwKQ0KDQphZGpfcnV0dGUxIDwtIGFzLm1hdHJpeChkZl9ydXR0ZTEpICU+JQ0KICByZXBsYWNlKGlzLm5hKC4pLCAwKQ0KDQphZGpfcnV0dGUyIDwtIGFzLm1hdHJpeChkZl9ydXR0ZTIpICU+JQ0KICByZXBsYWNlKGlzLm5hKC4pLCAwKQ0KDQphZGpfcnV0dGUzIDwtIGFzLm1hdHJpeChkZl9ydXR0ZTMpICU+JQ0KICByZXBsYWNlKGlzLm5hKC4pLCAwKQ0KDQphZGpfcnV0dGU0IDwtIGFzLm1hdHJpeChkZl9ydXR0ZTQpICU+JQ0KICByZXBsYWNlKGlzLm5hKC4pLCAwKQ0KDQphZGpfc2Nob29mMSA8LSBhcy5tYXRyaXgoZGZfc2Nob29mMSkgJT4lDQogIHJlcGxhY2UoaXMubmEoLiksIDApDQoNCmBgYA0KDQpUaGVuLCB3ZSBmaWxsIHRoZW0gaW4hDQoNCmBgYHtyfQ0KDQojYmFsa2VuZW5kZTQNCnBhcnRpamVuc3RlbWdlZHJhZyRiYWxrZW5lbmRlNCRhZGp2b3Rlc2JhbGsgPC0gYWRqX2JhbGtlbmVuZGU0DQoNCiNSdXR0ZTENCnBhcnRpamVuc3RlbWdlZHJhZyRydXR0ZTEkYWRqdm90ZXNydXR0ZTEgPC0gYWRqX3J1dHRlMQ0KDQojUnV0dGUyDQpwYXJ0aWplbnN0ZW1nZWRyYWckcnV0dGUyJGFkanZvdGVzcnV0dGUyIDwtIGFkal9ydXR0ZTINCg0KI1J1dHRlMw0KcGFydGlqZW5zdGVtZ2VkcmFnJHJ1dHRlMyRhZGp2b3Rlc3J1dHRlMyA8LSBhZGpfcnV0dGUzDQoNCiNSdXR0ZTQNCnBhcnRpamVuc3RlbWdlZHJhZyRydXR0ZTQkYWRqdm90ZXNydXR0ZTQgPC0gYWRqX3J1dHRlNA0KDQojU2Nob29mMQ0KcGFydGlqZW5zdGVtZ2VkcmFnJHNjaG9vZjEkYWRqdm90ZXNzY2hvb2YxIDwtIGFkal9zY2hvb2YxDQoNCmBgYA0KDQojIyMgR3JhcGgNCg0KTm93IHlvdSBtaWdodCBiZSB0aGlua2luZywgdGhpcyBvYmplY3Qgd2FzIG5vdCBwcmV2aW91c2x5IG1lbnRpb25lZCBpbiB0aGUgbGlzdC4gRXZlbiB0aG91Z2ggeW91IHNhaWQgc2FpZCBpdCB3YXMgYSBnb29kIG92ZXJ2aWV3IG9mIGV2ZXJ5dGhpbmcgdGhhdCB3YXMgZ29pbmcgdG8gYmUgYWRkZWQgb24gbGF0ZXIuLi4uLi4uLk9rYXkgSSBsaWVkLCBJIGFkZGVkIHRoaXMgc2VjdGlvbiBsYXRlciBvbiBkdXJpbmcgdGhlIHByb2Nlc3MgYnV0IHRob3VnaHQgaXQgd2FzIG1vcmUgZWZmaWNpZW50IHRvIGp1c3QgYWRkIHRoaXMgaGVyZSA6KQ0KDQpGaXJzdCwgd2UgY3JlYXRlIHRoZSBncmFwaHMNCg0KYGBge3J9DQpnX2JhbGtlbmVuZGU0IDwtIGdyYXBoX2Zyb21fYWRqYWNlbmN5X21hdHJpeChhZGpfYmFsa2VuZW5kZTQsIG1vZGU9YygiZGlyZWN0ZWQiKSwgd2VpZ2h0ZWQgPSBGLCBhZGQucm93bmFtZXMgPSBOQSkNCg0KZ19ydXR0ZTEgPC0gZ3JhcGhfZnJvbV9hZGphY2VuY3lfbWF0cml4KGFkal9ydXR0ZTEsIG1vZGU9YygiZGlyZWN0ZWQiKSwgd2VpZ2h0ZWQgPSBGLCBhZGQucm93bmFtZXMgPSBOQSkNCg0KZ19ydXR0ZTIgPC0gZ3JhcGhfZnJvbV9hZGphY2VuY3lfbWF0cml4KGFkal9ydXR0ZTIsIG1vZGU9YygiZGlyZWN0ZWQiKSwgd2VpZ2h0ZWQgPSBGLCBhZGQucm93bmFtZXMgPSBOQSkNCg0KZ19ydXR0ZTMgPC0gZ3JhcGhfZnJvbV9hZGphY2VuY3lfbWF0cml4KGFkal9ydXR0ZTMsIG1vZGU9YygiZGlyZWN0ZWQiKSwgd2VpZ2h0ZWQgPSBGLCBhZGQucm93bmFtZXMgPSBOQSkNCg0KZ19ydXR0ZTQgPC0gZ3JhcGhfZnJvbV9hZGphY2VuY3lfbWF0cml4KGFkal9ydXR0ZTQsIG1vZGU9YygiZGlyZWN0ZWQiKSwgd2VpZ2h0ZWQgPSBGLCBhZGQucm93bmFtZXMgPSBOQSkNCg0KZ19zY2hvb2YxIDwtIGdyYXBoX2Zyb21fYWRqYWNlbmN5X21hdHJpeChhZGpfc2Nob29mMSwgbW9kZSA9ICJkaXJlY3RlZCIsIHdlaWdodGVkID0gRiwgYWRkLnJvd25hbWVzID0gTkEpDQoNCmBgYA0KDQpUaGVuLCB3ZSB+fmZpbGx+fiAuLi4uICphZGQqIHRoZW0gaW4uLi4NCg0KYGBge3J9DQoNCnBhcnRpamVuc3RlbWdlZHJhZyRiYWxrZW5lbmRlNCRncmFwaGJhbGsgPC0gZ19iYWxrZW5lbmRlNA0KcGFydGlqZW5zdGVtZ2VkcmFnJHJ1dHRlMSRncmFwaHJ1dHRlMSA8LSBnX3J1dHRlMQ0KcGFydGlqZW5zdGVtZ2VkcmFnJHJ1dHRlMiRncmFwaHJ1dHRlMiA8LSBnX3J1dHRlMg0KcGFydGlqZW5zdGVtZ2VkcmFnJHJ1dHRlMyRncmFwaHJ1dHRlMyA8LSBnX3J1dHRlMw0KcGFydGlqZW5zdGVtZ2VkcmFnJHJ1dHRlNCRncmFwaHJ1dHRlNCA8LSBnX3J1dHRlNA0KcGFydGlqZW5zdGVtZ2VkcmFnJHNjaG9vZjEkZ3JhcGhzY2hvb2YxIDwtIGdfc2Nob29mMQ0KDQoNCmBgYA0KDQojIyMgV2VpZ2h0cw0KDQpMZXQncyBhZGQgd2VpZ2h0cyBmb3Igd2hldGhlciBjby12b3RpbmcgaXMgc21hbGxlciB0aGFuIDUwJSwgYmV0d2VlbiA1MCUtODAlIG9yIDgwJS0xMDAlLg0KDQpgYGB7cn0NCg0KYmFsa2VuZW5kZXdlaWdodHMxIDwtIGRmX2JhbGtlbmVuZGU0X3J1dyAlPiUNCiAgcmVwbGFjZShpcy5uYSguKSwgRkFMU0UpICU+JQ0KICBsYXBwbHkoZnVuY3Rpb24oeCkgaWZlbHNlKHg+PS41LCBUUlVFLCBGQUxTRSkpICU+JQ0KICBhcy5kYXRhLmZyYW1lKCkNCg0KYmFsa2VuZW5kZXdlaWdodHMyIDwtIGRmX2JhbGtlbmVuZGU0X3J1dyAlPiUNCiAgcmVwbGFjZShpcy5uYSguKSwgRkFMU0UpICU+JQ0KICBsYXBwbHkoZnVuY3Rpb24oeCkgaWZlbHNlKHg+PS44LCBUUlVFLCBGQUxTRSkpICU+JQ0KICBhcy5kYXRhLmZyYW1lKCkNCg0KYGBgDQoNCmBgYHtyfQ0KDQpydXR0ZTF3ZWlnaHRzMSA8LSBkZl9ydXR0ZTFfcnV3ICU+JQ0KICByZXBsYWNlKGlzLm5hKC4pLCBGQUxTRSkgJT4lDQogIGxhcHBseShmdW5jdGlvbih4KSBpZmVsc2UoeD49LjUsIFRSVUUsIEZBTFNFKSkgJT4lDQogIGFzLmRhdGEuZnJhbWUoKQ0KDQpydXR0ZTF3ZWlnaHRzMiA8LSBkZl9ydXR0ZTFfcnV3ICU+JQ0KICByZXBsYWNlKGlzLm5hKC4pLCBGQUxTRSkgJT4lDQogIGxhcHBseShmdW5jdGlvbih4KSBpZmVsc2UoeD49LjgsIFRSVUUsIEZBTFNFKSkgJT4lDQogIGFzLmRhdGEuZnJhbWUoKQ0KDQpgYGANCg0KYGBge3J9DQoNCnJ1dHRlMndlaWdodHMxIDwtIGRmX3J1dHRlMl9ydXcgJT4lDQogIHJlcGxhY2UoaXMubmEoLiksIEZBTFNFKSAlPiUNCiAgbGFwcGx5KGZ1bmN0aW9uKHgpIGlmZWxzZSh4Pj0uNSwgVFJVRSwgRkFMU0UpKSAlPiUNCiAgYXMuZGF0YS5mcmFtZSgpDQoNCnJ1dHRlMndlaWdodHMyIDwtIGRmX3J1dHRlMl9ydXcgJT4lDQogIHJlcGxhY2UoaXMubmEoLiksIEZBTFNFKSAlPiUNCiAgbGFwcGx5KGZ1bmN0aW9uKHgpIGlmZWxzZSh4Pj0uOCwgVFJVRSwgRkFMU0UpKSAlPiUNCiAgYXMuZGF0YS5mcmFtZSgpDQoNCmBgYA0KDQpgYGB7cn0NCg0KcnV0dGUzd2VpZ2h0czEgPC0gZGZfcnV0dGUzX3J1dyAlPiUNCiAgcmVwbGFjZShpcy5uYSguKSwgRkFMU0UpICU+JQ0KICBsYXBwbHkoZnVuY3Rpb24oeCkgaWZlbHNlKHg+PS41LCBUUlVFLCBGQUxTRSkpICU+JQ0KICBhcy5kYXRhLmZyYW1lKCkNCg0KcnV0dGUzd2VpZ2h0czIgPC0gZGZfcnV0dGUzX3J1dyAlPiUNCiAgcmVwbGFjZShpcy5uYSguKSwgRkFMU0UpICU+JQ0KICBsYXBwbHkoZnVuY3Rpb24oeCkgaWZlbHNlKHg+PS44LCBUUlVFLCBGQUxTRSkpICU+JQ0KICBhcy5kYXRhLmZyYW1lKCkNCg0KYGBgDQoNCmBgYHtyfQ0KDQpydXR0ZTR3ZWlnaHRzMSA8LSBkZl9ydXR0ZTRfcnV3ICU+JQ0KICByZXBsYWNlKGlzLm5hKC4pLCBGQUxTRSkgJT4lDQogIGxhcHBseShmdW5jdGlvbih4KSBpZmVsc2UoeD49LjUsIFRSVUUsIEZBTFNFKSkgJT4lDQogIGFzLmRhdGEuZnJhbWUoKQ0KDQpydXR0ZTR3ZWlnaHRzMiA8LSBkZl9ydXR0ZTRfcnV3ICU+JQ0KICByZXBsYWNlKGlzLm5hKC4pLCBGQUxTRSkgJT4lDQogIGxhcHBseShmdW5jdGlvbih4KSBpZmVsc2UoeD49LjgsIFRSVUUsIEZBTFNFKSkgJT4lDQogIGFzLmRhdGEuZnJhbWUoKQ0KDQpgYGANCg0KYGBge3J9DQoNCnNjaG9vZjF3ZWlnaHRzMSA8LSBkZl9zY2hvb2YxX3J1dyAlPiUNCiAgcmVwbGFjZShpcy5uYSguKSwgRkFMU0UpICU+JQ0KICBsYXBwbHkoZnVuY3Rpb24oeCkgaWZlbHNlKHg+PS41LCBUUlVFLCBGQUxTRSkpICU+JQ0KICBhcy5kYXRhLmZyYW1lKCkNCg0Kc2Nob29mMXdlaWdodHMyIDwtIGRmX3NjaG9vZjFfcnV3ICU+JQ0KICByZXBsYWNlKGlzLm5hKC4pLCBGQUxTRSkgJT4lDQogIGxhcHBseShmdW5jdGlvbih4KSBpZmVsc2UoeD49LjgsIFRSVUUsIEZBTFNFKSkgJT4lDQogIGFzLmRhdGEuZnJhbWUoKQ0KDQpgYGANCg0KTGV0J3MgcHV0IHRoZW0gaW4gdGhlIGxpc3QgYXMgd2VsbCENCg0KYGBge3J9DQojYmFsa2VuZW5kZTQNCnBhcnRpamVuc3RlbWdlZHJhZyRiYWxrZW5lbmRlNCR3ZWlnaHRzMWJhbGsgPC0gYmFsa2VuZW5kZXdlaWdodHMxDQpwYXJ0aWplbnN0ZW1nZWRyYWckYmFsa2VuZW5kZTQkd2VpZ2h0czJiYWxrIDwtIGJhbGtlbmVuZGV3ZWlnaHRzMg0KDQojUnV0dGUxDQpwYXJ0aWplbnN0ZW1nZWRyYWckcnV0dGUxJHdlaWdodHMxcnV0dGUxIDwtIHJ1dHRlMXdlaWdodHMxDQpwYXJ0aWplbnN0ZW1nZWRyYWckcnV0dGUxJHdlaWdodHMycnV0dGUxIDwtIHJ1dHRlMXdlaWdodHMyDQoNCiNSdXR0ZTINCnBhcnRpamVuc3RlbWdlZHJhZyRydXR0ZTIkd2VpZ2h0czFydXR0ZTIgPC0gcnV0dGUyd2VpZ2h0czENCnBhcnRpamVuc3RlbWdlZHJhZyRydXR0ZTIkd2VpZ2h0czJydXR0ZTIgPC0gcnV0dGUyd2VpZ2h0czINCg0KI1J1dHRlMw0KcGFydGlqZW5zdGVtZ2VkcmFnJHJ1dHRlMyR3ZWlnaHRzMXJ1dHRlMyA8LSBydXR0ZTN3ZWlnaHRzMQ0KcGFydGlqZW5zdGVtZ2VkcmFnJHJ1dHRlMyR3ZWlnaHRzMnJ1dHRlMyA8LSBydXR0ZTN3ZWlnaHRzMg0KDQojUnV0dGU0DQpwYXJ0aWplbnN0ZW1nZWRyYWckcnV0dGU0JHdlaWdodHMxcnV0dGU0IDwtIHJ1dHRlNHdlaWdodHMxDQpwYXJ0aWplbnN0ZW1nZWRyYWckcnV0dGU0JHdlaWdodHMycnV0dGU0IDwtIHJ1dHRlNHdlaWdodHMyDQoNCiNTY2hvb2YxDQpwYXJ0aWplbnN0ZW1nZWRyYWckc2Nob29mMSR3ZWlnaHRzMXNjaG9vZjEgPC0gc2Nob29mMXdlaWdodHMxDQpwYXJ0aWplbnN0ZW1nZWRyYWckc2Nob29mMSR3ZWlnaHRzMnNjaG9vZjEgPC0gc2Nob29mMXdlaWdodHMyDQoNCmBgYA0KDQojIyMgRmluYWwgc2F2ZQ0KDQpTYXZpbmcgdGhlIGxpc3QgZm9yIHBvdGVudGlhbCB0cmFuc2Zlci9kb3dubG9hZA0KDQpgYGB7cn0NCnNhdmVSRFMocGFydGlqZW5zdGVtZ2VkcmFnLCAiQzovVXNlcnMvbmllbHMvRG93bmxvYWRzL1JNU0NTL1llYXIgMi9Tb2NpYWwgTmV0d29ya3MvbGFiam91cm5hbF9zb2NpYWxfbmV0d29ya3MvZGF0YS9wYXJ0aWplbnN0ZW1nZWRyYWdkYXRhbGlzdC5SZGF0YSIpDQoNCmBgYA0K</div>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeSourceEmbed("datapreperation.Rmd");
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

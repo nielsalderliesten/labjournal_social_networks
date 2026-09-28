@@ -1,0 +1,615 @@
+---
+title: "voting_data_attempt"
+author: "Niels Alderliesten"
+date: "2026-09-21"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(RSiena)
+library(igraph)
+library(tidyverse)
+library(igraph)
+library(dutchparl)
+library(R.filesets)
+```
+
+## Some initial exploration with other data origins
+
+### The Dutch Parliamentary Behaviour Dataset:
+
+<https://research.rug.nl/en/publications/the-dutch-parliamentary-behaviour-dataset/>
+
+```{r }
+votes <- loadRDS("C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/votes.rds")
+
+partyInfo<- votes[[7]]
+
+party_name_short <- partyInfo[[4]]
+
+party_name_short_df <- as.data.frame(party_name_short)
+
+View(party_name_short_df)
+
+votesame(examplevotes)
+
+?votesame
+```
+
+### Setting up a matrix from scratch, subsequently removing NAs
+
+```{r}
+testm <- matrix(NA, nrow=4, ncol=4)
+testm[1,1] <- 0
+testm[1,2] <- 1
+testm[1,3] <- 0
+testm[1,4] <- 1
+testm[2,1] <- 1
+testm[2,4] <- 0
+testm[3,4] <- 1
+testm[3,3] <- 1
+testm[3,2] <- 0
+
+missingrow <- rowSums(is.na(testm)) == nrow(testm)
+missingcol <- colSums(is.na(testm)) == ncol(testm)
+
+totalmissing <- which(missingrow & missingcol) #Welke ontbreken compleet, welke zou je dus weg kunnen halen.
+
+which(missingrow)
+testm
+testm[which(missingrow),] <- 0
+testm[, which(missingcol)] <- 0
+
+missingrow
+missingcol
+#Voor RSienna hij was 1.0 = speciale missing waarde. Hij kan wel genomineerd worden maar hij was er niet.
+#NA blijft als hij er volgende keer wel bij is
+
+```
+
+### Attempting to see if I can webscrape ONE! value
+
+```{r}
+#schoof1_url <- "https://www.partijgedrag.nl/party-likeness"
+#schoof1 <- rvest::read_html(schoof1_url)
+
+#schoof1_thingy <- schoof1 %>% rvest::html_elements("body") %>% html_elements("div") %>% html_children() %>%
+#  html_elements("main")
+
+
+#schoof1_thingy[2] %>% html_children %>% html_elements("main") %>% html_children() %>% html_children()
+  
+  
+  
+
+#  html_elements("table") %>%
+#  html_elements("tbody") %>% html_children
+
+#html_elements(schoof1, html\body\div[2]\div\main\div\div[3]\div\div[2]\div\table\tbody)
+
+```
+
+Tot nu toe nog niet gelukt helaas.
+
+## Own Data
+
+Data personally gathered from openkamer.org
+
+<https://www.openkamer.org/stats/stemmingen/partijen/>
+
+As well as from the Chapell Hill Data
+
+### List object
+
+First, we create a list that will later function as a collection where we can place all data Note: It is not necessary to add all the sub-items already. These can also be added during the process. However I liked it, in order to keep overview of what needed to be done.
+
+```{r}
+partijenstemgedrag <- list(balkenende4 = list(NA, NA, NA, NA, NA, NA),
+                           rutte1 = list(NA, NA, NA, NA, NA, NA), 
+                           rutte2 = list(NA, NA, NA, NA, NA, NA), 
+                           rutte3 = list(NA, NA, NA, NA, NA, NA),
+                           rutte4 = list(NA, NA, NA, NA, NA, NA), 
+                           schoof1 = list(NA, NA, NA, NA, NA, NA))
+
+names(partijenstemgedrag$balkenende4) <- c("votesbalk", "originvotesbalk", "adjvotesbalk", "statsbalk", "weights1balk", "weights2balk")
+
+names(partijenstemgedrag$rutte1) <- c("votesrutte1", "originvotesrutte1", "adjvotesrutte1", "statsrutte1", "weights1rutte1", "weights2rutte1")
+
+names(partijenstemgedrag$rutte2) <- c("votesrutte2", "originvotesrutte2", "adjvotesrutte2", "statsrutte2", "weights1rutte2", "weights2rutte2")
+
+names(partijenstemgedrag$rutte3) <- c("votesrutte3", "originvotesrutte3", "adjvotesrutte3", "statsrutte3", "weights1rutte3", "weights2rutte3")
+
+names(partijenstemgedrag$rutte4) <- c("votesrutte4", "originvotesrutte4", "adjvotesrutte4", "statsrutte4", "weights1rutte4", "weights2rutte4")
+
+names(partijenstemgedrag$schoof1) <- c("votesschoof1", "originvotesschoof1", "adjvotesschoof1", "statsschoof1", "weights1schoof1", "weights2schoof1")
+
+```
+
+### Votes
+
+First, we download all the votes dataframes
+
+```{r}
+library(readxl)
+
+df_balkenende4 <- as.data.frame(readxl::read_excel("C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx", sheet = 1))
+
+df_rutte1 <- as.data.frame(readxl::read_excel("C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx", sheet = 3))
+
+df_rutte2 <- as.data.frame(readxl::read_excel("C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx", sheet = 5))
+
+df_rutte3 <- as.data.frame(readxl::read_excel("C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx", sheet = 7))
+
+df_rutte4 <- as.data.frame(readxl::read_excel("C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx", sheet = 9))
+
+df_schoof1 <- as.data.frame(readxl::read_excel("C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx", sheet = 11))
+
+```
+
+Subsequently, we clean up the votes dataframes and make them ready (in the format of adjacency matrix)
+
+```{r, warning=F}
+
+rownames(df_balkenende4) <- df_balkenende4[,1]
+
+df_balkenende4 <- df_balkenende4[,-1]
+
+df_balkenende4[] <- lapply(df_balkenende4, as.numeric)
+
+#Let's keep this one apart as well, just in case
+df_balkenende4_ruw <- df_balkenende4
+
+df_balkenende4[] <- lapply(df_balkenende4, function(x) ifelse(x>.5, 1, x))
+df_balkenende4[] <- lapply(df_balkenende4, function(x) ifelse(x<=.5, 0, x))
+
+```
+
+```{r, warning=F}
+
+rownames(df_rutte1) <- df_rutte1[,1]
+
+df_rutte1 <- df_rutte1[,-1]
+
+df_rutte1[] <- lapply(df_rutte1, as.numeric)
+
+df_rutte1_ruw <- df_rutte1
+
+df_rutte1[] <- lapply(df_rutte1, function(x) ifelse(x>.5, 1, x))
+df_rutte1[] <- lapply(df_rutte1, function(x) ifelse(x<=.5, 0, x))
+
+```
+
+```{r, warning=F}
+
+rownames(df_rutte2) <- df_rutte2[,1]
+
+df_rutte2 <- df_rutte2[,-1]
+
+df_rutte2[] <- lapply(df_rutte2, as.numeric)
+
+df_rutte2_ruw <- df_rutte2
+
+df_rutte2[] <- lapply(df_rutte2, function(x) ifelse(x>.5, 1, x))
+df_rutte2[] <- lapply(df_rutte2, function(x) ifelse(x<=.5, 0, x))
+
+```
+
+```{r, warning=F}
+
+rownames(df_rutte3) <- df_rutte3[,1]
+
+df_rutte3 <- df_rutte3[,-1]
+
+df_rutte3[] <- lapply(df_rutte3, as.numeric)
+
+df_rutte3_ruw <- df_rutte3
+
+df_rutte3[] <- lapply(df_rutte3, function(x) ifelse(x>.5, 1, x))
+df_rutte3[] <- lapply(df_rutte3, function(x) ifelse(x<=.5, 0, x))
+
+```
+
+```{r, warning=F}
+
+rownames(df_rutte4) <- df_rutte4[,1]
+
+df_rutte4 <- df_rutte4[,-1]
+
+df_rutte4[] <- lapply(df_rutte4, as.numeric)
+
+df_rutte4_ruw <- df_rutte4
+
+df_rutte4[] <- lapply(df_rutte4, function(x) ifelse(x>.5, 1, x))
+df_rutte4[] <- lapply(df_rutte4, function(x) ifelse(x<=.5, 0, x))
+
+```
+
+```{r, warning=F}
+
+rownames(df_schoof1) <- df_schoof1[,1]
+
+df_schoof1 <- df_schoof1[,-1]
+
+df_schoof1[] <- lapply(df_schoof1, as.numeric)
+
+df_schoof1_ruw <- df_schoof1
+
+df_schoof1[] <- lapply(df_schoof1, function(x) ifelse(x>.5, 1, x))
+df_schoof1[] <- lapply(df_schoof1, function(x) ifelse(x<=.5, 0, x))
+
+```
+
+Fill in the slots for votes!
+
+```{r}
+
+#balkenende4
+partijenstemgedrag$balkenende4$votesbalk <- df_balkenende4
+partijenstemgedrag$balkenende4$originvotesbalk <- df_balkenende4_ruw
+
+#Rutte1
+
+partijenstemgedrag$rutte1$votesrutte1 <- df_rutte1
+partijenstemgedrag$rutte1$originvotesrutte1 <- df_rutte1_ruw
+
+#Rutte2
+partijenstemgedrag$rutte2$votesrutte2 <- df_rutte2
+partijenstemgedrag$rutte2$originvotesrutte2 <- df_rutte2_ruw
+
+#Rutte3
+partijenstemgedrag$rutte3$votesrutte3 <- df_rutte3
+partijenstemgedrag$rutte3$originvotesrutte3 <- df_rutte3_ruw
+
+#Rutte4
+partijenstemgedrag$rutte4$votesrutte4 <- df_rutte4
+partijenstemgedrag$rutte4$originvotesrutte4 <- df_rutte4_ruw
+
+#Schoof1
+partijenstemgedrag$schoof1$votesschoof1 <- df_schoof1
+partijenstemgedrag$schoof1$originvotesrutteschoof1 <- df_schoof1_ruw
+
+```
+
+### Stats!
+
+First, we download the stats files
+
+```{r}
+
+stats_balkenende4_df <- as.data.frame(readxl::read_excel("C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx", sheet = 2))
+
+stats_rutte1_df <- as.data.frame(readxl::read_excel("C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx", sheet = 4))
+
+stats_rutte2_df <- as.data.frame(readxl::read_excel("C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx", sheet = 6))
+
+stats_rutte3_df <- as.data.frame(readxl::read_excel("C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx", sheet = 8))
+
+stats_rutte4_df <- as.data.frame(readxl::read_excel("C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx", sheet = 10))
+
+stats_schoof1_df <- as.data.frame(readxl::read_excel("C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijgedrag_data.xlsx", sheet = 12))
+
+```
+
+Subsequently, we clean up the stats dataframes and make them ready
+
+```{r, warning=F}
+
+rownames(stats_balkenende4_df) <- stats_balkenende4_df[,1]
+
+stats_balkenende4_df <- stats_balkenende4_df[,-1]
+
+stats_balkenende4_df$coalitie <- as.factor(stats_balkenende4_df$coalitie)
+stats_balkenende4_df$oppositie <- as.factor(stats_balkenende4_df$oppositie)
+
+stats_balkenende4_df$ch_ideologie <- as.numeric(stats_balkenende4_df$ch_ideologie)
+
+
+```
+
+```{r, warning=F}
+
+rownames(stats_rutte1_df) <- stats_rutte1_df[,1]
+
+stats_rutte1_df <- stats_rutte1_df[,-1]
+
+stats_rutte1_df$coalitie <- as.factor(stats_rutte1_df$coalitie)
+stats_rutte1_df$oppositie <- as.factor(stats_rutte1_df$oppositie)
+
+stats_rutte1_df$ch_ideologie <- as.numeric(stats_rutte1_df$ch_ideologie)
+
+
+```
+
+```{r, warning=F}
+
+rownames(stats_rutte2_df) <- stats_rutte2_df[,1]
+
+stats_rutte2_df <- stats_rutte2_df[,-1]
+
+stats_rutte2_df$coalitie <- as.factor(stats_rutte2_df$coalitie)
+stats_rutte2_df$oppositie <- as.factor(stats_rutte2_df$oppositie)
+
+stats_rutte2_df$ch_ideologie <- as.numeric(stats_rutte2_df$ch_ideologie)
+
+
+```
+
+```{r, warning=F}
+
+rownames(stats_rutte3_df) <- stats_rutte3_df[,1]
+
+stats_rutte3_df <- stats_rutte3_df[,-1]
+
+stats_rutte3_df$coalitie <- as.factor(stats_rutte3_df$coalitie)
+stats_rutte3_df$oppositie <- as.factor(stats_rutte3_df$oppositie)
+
+stats_rutte3_df$ch_ideologie <- as.numeric(stats_rutte3_df$ch_ideologie)
+
+```
+
+```{r, warning=F}
+
+rownames(stats_rutte4_df) <- stats_rutte4_df[,1]
+
+stats_rutte4_df <- stats_rutte4_df[,-1]
+
+stats_rutte4_df$coalitie <- as.factor(stats_rutte4_df$coalitie)
+stats_rutte4_df$oppositie <- as.factor(stats_rutte4_df$oppositie)
+
+stats_rutte4_df$ch_ideologie <- as.numeric(stats_rutte4_df$ch_ideologie)
+
+```
+
+```{r, warning=F}
+
+rownames(stats_schoof1_df) <- stats_schoof1_df[,1]
+
+stats_schoof1_df <- stats_schoof1_df[,-1]
+
+stats_schoof1_df$coalitie <- as.factor(stats_schoof1_df$coalitie)
+stats_schoof1_df$oppositie <- as.factor(stats_schoof1_df$oppositie)
+
+stats_schoof1_df$ch_ideologie <- as.numeric(stats_schoof1_df$ch_ideologie)
+
+```
+
+Fill in the slots for votes!
+
+```{r}
+
+#balkenende4
+partijenstemgedrag$balkenende4$statsbalk <- stats_balkenende4_df
+
+#Rutte1
+partijenstemgedrag$rutte1$statsrutte1 <- stats_rutte1_df
+
+#Rutte2
+partijenstemgedrag$rutte2$statsrutte2 <- stats_rutte2_df
+
+#Rutte3
+partijenstemgedrag$rutte3$statsrutte3 <- stats_rutte3_df
+
+#Rutte4
+partijenstemgedrag$rutte4$statsrutte4 <- stats_rutte4_df
+
+#Schoof1
+partijenstemgedrag$schoof1$statsschoof1 <- stats_schoof1_df
+
+```
+
+### Adjacency matrixes
+
+First, we create the adjacancy matrixes
+
+```{r}
+
+#Turns out that R won't make an igraph (properly) if there are NAs in a matrix? Which is why I remove them. 
+
+adj_balkenende4 <- as.matrix(df_balkenende4) %>%
+  replace(is.na(.), 0)
+
+adj_rutte1 <- as.matrix(df_rutte1) %>%
+  replace(is.na(.), 0)
+
+adj_rutte2 <- as.matrix(df_rutte2) %>%
+  replace(is.na(.), 0)
+
+adj_rutte3 <- as.matrix(df_rutte3) %>%
+  replace(is.na(.), 0)
+
+adj_rutte4 <- as.matrix(df_rutte4) %>%
+  replace(is.na(.), 0)
+
+adj_schoof1 <- as.matrix(df_schoof1) %>%
+  replace(is.na(.), 0)
+
+```
+
+Then, we fill them in!
+
+```{r}
+
+#balkenende4
+partijenstemgedrag$balkenende4$adjvotesbalk <- adj_balkenende4
+
+#Rutte1
+partijenstemgedrag$rutte1$adjvotesrutte1 <- adj_rutte1
+
+#Rutte2
+partijenstemgedrag$rutte2$adjvotesrutte2 <- adj_rutte2
+
+#Rutte3
+partijenstemgedrag$rutte3$adjvotesrutte3 <- adj_rutte3
+
+#Rutte4
+partijenstemgedrag$rutte4$adjvotesrutte4 <- adj_rutte4
+
+#Schoof1
+partijenstemgedrag$schoof1$adjvotesschoof1 <- adj_schoof1
+
+```
+
+### Graph
+
+Now you might be thinking, this object was not previously mentioned in the list. Even though you said said it was a good overview of everything that was going to be added on later........Okay I lied, I added this section later on during the process but thought it was more efficient to just add this here :)
+
+First, we create the graphs
+
+```{r}
+g_balkenende4 <- graph_from_adjacency_matrix(adj_balkenende4, mode=c("directed"), weighted = F, add.rownames = NA)
+
+g_rutte1 <- graph_from_adjacency_matrix(adj_rutte1, mode=c("directed"), weighted = F, add.rownames = NA)
+
+g_rutte2 <- graph_from_adjacency_matrix(adj_rutte2, mode=c("directed"), weighted = F, add.rownames = NA)
+
+g_rutte3 <- graph_from_adjacency_matrix(adj_rutte3, mode=c("directed"), weighted = F, add.rownames = NA)
+
+g_rutte4 <- graph_from_adjacency_matrix(adj_rutte4, mode=c("directed"), weighted = F, add.rownames = NA)
+
+g_schoof1 <- graph_from_adjacency_matrix(adj_schoof1, mode = "directed", weighted = F, add.rownames = NA)
+
+```
+
+Then, we ~~fill~~ .... *add* them in...
+
+```{r}
+
+partijenstemgedrag$balkenende4$graphbalk <- g_balkenende4
+partijenstemgedrag$rutte1$graphrutte1 <- g_rutte1
+partijenstemgedrag$rutte2$graphrutte2 <- g_rutte2
+partijenstemgedrag$rutte3$graphrutte3 <- g_rutte3
+partijenstemgedrag$rutte4$graphrutte4 <- g_rutte4
+partijenstemgedrag$schoof1$graphschoof1 <- g_schoof1
+
+
+```
+
+### Weights
+
+Let's add weights for whether co-voting is smaller than 50%, between 50%-80% or 80%-100%.
+
+```{r}
+
+balkenendeweights1 <- df_balkenende4_ruw %>%
+  replace(is.na(.), FALSE) %>%
+  lapply(function(x) ifelse(x>=.5, TRUE, FALSE)) %>%
+  as.data.frame()
+
+balkenendeweights2 <- df_balkenende4_ruw %>%
+  replace(is.na(.), FALSE) %>%
+  lapply(function(x) ifelse(x>=.8, TRUE, FALSE)) %>%
+  as.data.frame()
+
+```
+
+```{r}
+
+rutte1weights1 <- df_rutte1_ruw %>%
+  replace(is.na(.), FALSE) %>%
+  lapply(function(x) ifelse(x>=.5, TRUE, FALSE)) %>%
+  as.data.frame()
+
+rutte1weights2 <- df_rutte1_ruw %>%
+  replace(is.na(.), FALSE) %>%
+  lapply(function(x) ifelse(x>=.8, TRUE, FALSE)) %>%
+  as.data.frame()
+
+```
+
+```{r}
+
+rutte2weights1 <- df_rutte2_ruw %>%
+  replace(is.na(.), FALSE) %>%
+  lapply(function(x) ifelse(x>=.5, TRUE, FALSE)) %>%
+  as.data.frame()
+
+rutte2weights2 <- df_rutte2_ruw %>%
+  replace(is.na(.), FALSE) %>%
+  lapply(function(x) ifelse(x>=.8, TRUE, FALSE)) %>%
+  as.data.frame()
+
+```
+
+```{r}
+
+rutte3weights1 <- df_rutte3_ruw %>%
+  replace(is.na(.), FALSE) %>%
+  lapply(function(x) ifelse(x>=.5, TRUE, FALSE)) %>%
+  as.data.frame()
+
+rutte3weights2 <- df_rutte3_ruw %>%
+  replace(is.na(.), FALSE) %>%
+  lapply(function(x) ifelse(x>=.8, TRUE, FALSE)) %>%
+  as.data.frame()
+
+```
+
+```{r}
+
+rutte4weights1 <- df_rutte4_ruw %>%
+  replace(is.na(.), FALSE) %>%
+  lapply(function(x) ifelse(x>=.5, TRUE, FALSE)) %>%
+  as.data.frame()
+
+rutte4weights2 <- df_rutte4_ruw %>%
+  replace(is.na(.), FALSE) %>%
+  lapply(function(x) ifelse(x>=.8, TRUE, FALSE)) %>%
+  as.data.frame()
+
+```
+
+```{r}
+
+schoof1weights1 <- df_schoof1_ruw %>%
+  replace(is.na(.), FALSE) %>%
+  lapply(function(x) ifelse(x>=.5, TRUE, FALSE)) %>%
+  as.data.frame()
+
+schoof1weights2 <- df_schoof1_ruw %>%
+  replace(is.na(.), FALSE) %>%
+  lapply(function(x) ifelse(x>=.8, TRUE, FALSE)) %>%
+  as.data.frame()
+
+```
+
+Let's put them in the list as well!
+
+```{r}
+#balkenende4
+partijenstemgedrag$balkenende4$weights1balk <- balkenendeweights1
+partijenstemgedrag$balkenende4$weights2balk <- balkenendeweights2
+
+#Rutte1
+partijenstemgedrag$rutte1$weights1rutte1 <- rutte1weights1
+partijenstemgedrag$rutte1$weights2rutte1 <- rutte1weights2
+
+#Rutte2
+partijenstemgedrag$rutte2$weights1rutte2 <- rutte2weights1
+partijenstemgedrag$rutte2$weights2rutte2 <- rutte2weights2
+
+#Rutte3
+partijenstemgedrag$rutte3$weights1rutte3 <- rutte3weights1
+partijenstemgedrag$rutte3$weights2rutte3 <- rutte3weights2
+
+#Rutte4
+partijenstemgedrag$rutte4$weights1rutte4 <- rutte4weights1
+partijenstemgedrag$rutte4$weights2rutte4 <- rutte4weights2
+
+#Schoof1
+partijenstemgedrag$schoof1$weights1schoof1 <- schoof1weights1
+partijenstemgedrag$schoof1$weights2schoof1 <- schoof1weights2
+
+```
+
+### Final save
+
+Saving the list for potential transfer/download
+
+```{r}
+saveRDS(partijenstemgedrag, "C:/Users/niels/Downloads/RMSCS/Year 2/Social Networks/labjournal_social_networks/data/partijenstemgedragdatalist.Rdata")
+
+```

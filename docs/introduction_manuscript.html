@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Niels Alderliesten" />
+
+<meta name="date" content="2026-09-21" />
+
+<title>introduction_manuscript</title>
+
+<script src="site_libs/header-attrs-2.31/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script src="site_libs/navigation-1.1/sourceembed.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+<style type="text/css">
+#rmd-source-code {
+  display: none;
+}
+</style>
+
+
+<link rel="stylesheet" href="tweaks.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Lab Journal
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Week1.html">Week 1</a>
+    </li>
+    <li>
+      <a href="Week2.html">Week 2</a>
+    </li>
+    <li>
+      <a href="Week3.html">Week 3</a>
+    </li>
+    <li>
+      <a href="Week4.html">Week 4</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Manuscript
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="introduction_manuscript.Rmd">Introduction</a>
+    </li>
+    <li>
+      <a href="datapreperation.Rmd">Data</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://nielsalderliesten.github.io/labjournal_social_networks/">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+<li role="separator" class="divider"></li>
+<li><a id="rmd-download-source" href="#">Download Rmd</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">introduction_manuscript</h1>
+<h4 class="author">Niels Alderliesten</h4>
+<h4 class="date">2026-09-21</h4>
+
+</div>
+
+
+<div id="introduction-draft" class="section level2" number="1">
+<h2><span class="header-section-number">1</span> Introduction
+(draft)</h2>
+<p>The political landscape of Western Europe has undergone significant
+changes in the past twenty years following the emergence of new green
+parties and radical right parties (Mudde, 2014; Wal, 2025). Particularly
+in multi-party systems has electoral systems have become increasingly
+versatile, with populist radical right (PRR) parties increasingly
+shifting power dynamics and forcing mainstream parties to adapt to their
+presence (Mudde, 2014; Wal, 2025). Radical right-wing parties have
+arised as new coalition partners, with right-wing and radical right-wing
+parties converging on issues such as migration (de Lange, 2012).</p>
+<p>This paper introduces the Netherlands as a case of observation,
+understood as a highly fragmented party system due to its low
+registration required for elections, incenvatizing new parties to form
+and compete (De Lange, 2022; Otjes &amp; De Lange, 2025). Within the
+Dutch party system, consensus, agreements and government coalitions have
+played a crucial role (Lijphart, 1998; Otjes &amp; De Lange, 2025).
+traditionally, These government coalitions tended to be formed around
+the centre. However, since the 2000s, the Dutch party system has been in
+a state of flux (De Lange, 2018; Pellikaan et al., 2018; Pennings &amp;
+Keman, 2008; Wal, 2025; Wijnen &amp; van der Brug, 2026). Centre parties
+have been increasingly diverging (Van der Brug et al., 2009), right-wing
+parties moving further to the right, balbalbalablbaa, with some even
+concluding that the centre has lost it’s stabile position at the core or
+heart of the Dutch system (Wal, 2025). Despite these developments,
+studies on parliamentary voting in the Netherlands were absent between
+1977 and 2011 (Louwerse et al., 2018). While there has been growing
+interest in analyzing the structural behaviour and dynamics of Dutch
+parties, for instance in the form of spatial modelling (e.g. Louwerse et
+al., 2018; [insert examples from Louwerse], an explicit social network
+approach has been scarce. <br></p>
+<p>[Insert the benefits of an explicit social network approach, such as
+illuminating the strategies and consequences of previously formed ties,
+interdependencies). In this paper, I will analyze Dutch parliamentary
+voting and it’s structural changes, proposing the following two research
+questions:</p>
+<p><em>To what extent is there segregation in co-voting among political
+parties? How has this developed over time</em>?</p>
+<p><em>To what extent can co-voting segregation patterns be attributed
+to changes in ideological distance?</em></p>
+</div>
+
+<div id="rmd-source-code">LS0tDQp0aXRsZTogImludHJvZHVjdGlvbl9tYW51c2NyaXB0Ig0KYXV0aG9yOiAiTmllbHMgQWxkZXJsaWVzdGVuIg0KZGF0ZTogIjIwMjYtMDktMjEiDQpvdXRwdXQ6IGh0bWxfZG9jdW1lbnQNCi0tLQ0KDQpgYGB7ciBzZXR1cCwgaW5jbHVkZT1GQUxTRX0NCmtuaXRyOjpvcHRzX2NodW5rJHNldChlY2hvID0gVFJVRSkNCmBgYA0KDQojIyBJbnRyb2R1Y3Rpb24gKGRyYWZ0KQ0KDQpUaGUgcG9saXRpY2FsIGxhbmRzY2FwZSBvZiBXZXN0ZXJuIEV1cm9wZSBoYXMgdW5kZXJnb25lIHNpZ25pZmljYW50IGNoYW5nZXMgaW4gdGhlIHBhc3QgdHdlbnR5IHllYXJzIGZvbGxvd2luZyB0aGUgZW1lcmdlbmNlIG9mIG5ldyBncmVlbiBwYXJ0aWVzIGFuZCByYWRpY2FsIHJpZ2h0IHBhcnRpZXMgKE11ZGRlLCAyMDE0OyBXYWwsIDIwMjUpLiBQYXJ0aWN1bGFybHkgaW4gbXVsdGktcGFydHkgc3lzdGVtcyBoYXMgZWxlY3RvcmFsIHN5c3RlbXMgaGF2ZSBiZWNvbWUgaW5jcmVhc2luZ2x5IHZlcnNhdGlsZSwgd2l0aCBwb3B1bGlzdCByYWRpY2FsIHJpZ2h0IChQUlIpIHBhcnRpZXMgaW5jcmVhc2luZ2x5IHNoaWZ0aW5nIHBvd2VyIGR5bmFtaWNzIGFuZCBmb3JjaW5nIG1haW5zdHJlYW0gcGFydGllcyB0byBhZGFwdCB0byB0aGVpciBwcmVzZW5jZSAoTXVkZGUsIDIwMTQ7IFdhbCwgMjAyNSkuIFJhZGljYWwgcmlnaHQtd2luZyBwYXJ0aWVzIGhhdmUgYXJpc2VkIGFzIG5ldyBjb2FsaXRpb24gcGFydG5lcnMsIHdpdGggcmlnaHQtd2luZyBhbmQgcmFkaWNhbCByaWdodC13aW5nIHBhcnRpZXMgY29udmVyZ2luZyBvbiBpc3N1ZXMgc3VjaCBhcyBtaWdyYXRpb24gKGRlIExhbmdlLCAyMDEyKS4NCg0KVGhpcyBwYXBlciBpbnRyb2R1Y2VzIHRoZSBOZXRoZXJsYW5kcyBhcyBhIGNhc2Ugb2Ygb2JzZXJ2YXRpb24sIHVuZGVyc3Rvb2QgYXMgYSBoaWdobHkgZnJhZ21lbnRlZCBwYXJ0eSBzeXN0ZW0gZHVlIHRvIGl0cyBsb3cgcmVnaXN0cmF0aW9uIHJlcXVpcmVkIGZvciBlbGVjdGlvbnMsIGluY2VudmF0aXppbmcgbmV3IHBhcnRpZXMgdG8gZm9ybSBhbmQgY29tcGV0ZSAoRGUgTGFuZ2UsIDIwMjI7IE90amVzICYgRGUgTGFuZ2UsIDIwMjUpLiBXaXRoaW4gdGhlIER1dGNoIHBhcnR5IHN5c3RlbSwgY29uc2Vuc3VzLCBhZ3JlZW1lbnRzIGFuZCBnb3Zlcm5tZW50IGNvYWxpdGlvbnMgaGF2ZSBwbGF5ZWQgYSBjcnVjaWFsIHJvbGUgKExpanBoYXJ0LCAxOTk4OyBPdGplcyAmIERlIExhbmdlLCAyMDI1KS4gdHJhZGl0aW9uYWxseSwgVGhlc2UgZ292ZXJubWVudCBjb2FsaXRpb25zIHRlbmRlZCB0byBiZSBmb3JtZWQgYXJvdW5kIHRoZSBjZW50cmUuIEhvd2V2ZXIsIHNpbmNlIHRoZSAyMDAwcywgdGhlIER1dGNoIHBhcnR5IHN5c3RlbSBoYXMgYmVlbiBpbiBhIHN0YXRlIG9mIGZsdXggKERlIExhbmdlLCAyMDE4OyBQZWxsaWthYW4gZXQgYWwuLCAyMDE4OyBQZW5uaW5ncyAmIEtlbWFuLCAyMDA4OyBXYWwsIDIwMjU7IFdpam5lbiAmIHZhbiBkZXIgQnJ1ZywgMjAyNikuIENlbnRyZSBwYXJ0aWVzIGhhdmUgYmVlbiBpbmNyZWFzaW5nbHkgZGl2ZXJnaW5nIChWYW4gZGVyIEJydWcgZXQgYWwuLCAyMDA5KSwgcmlnaHQtd2luZyBwYXJ0aWVzIG1vdmluZyBmdXJ0aGVyIHRvIHRoZSByaWdodCwgYmFsYmFsYmFsYWJsYmFhLCB3aXRoIHNvbWUgZXZlbiBjb25jbHVkaW5nIHRoYXQgdGhlIGNlbnRyZSBoYXMgbG9zdCBpdOKAmXMgc3RhYmlsZSBwb3NpdGlvbiBhdCB0aGUgY29yZSBvciBoZWFydCBvZiB0aGUgRHV0Y2ggc3lzdGVtIChXYWwsIDIwMjUpLiBEZXNwaXRlIHRoZXNlIGRldmVsb3BtZW50cywgc3R1ZGllcyBvbiBwYXJsaWFtZW50YXJ5IHZvdGluZyBpbiB0aGUgTmV0aGVybGFuZHMgd2VyZSBhYnNlbnQgYmV0d2VlbiAxOTc3IGFuZCAyMDExIChMb3V3ZXJzZSBldCBhbC4sIDIwMTgpLiBXaGlsZSB0aGVyZSBoYXMgYmVlbiBncm93aW5nIGludGVyZXN0IGluIGFuYWx5emluZyB0aGUgc3RydWN0dXJhbCBiZWhhdmlvdXIgYW5kIGR5bmFtaWNzIG9mIER1dGNoIHBhcnRpZXMsIGZvciBpbnN0YW5jZSBpbiB0aGUgZm9ybSBvZiBzcGF0aWFsIG1vZGVsbGluZyAoZS5nLiBMb3V3ZXJzZSBldCBhbC4sIDIwMTg7IFtpbnNlcnQgZXhhbXBsZXMgZnJvbSBMb3V3ZXJzZV0sIGFuIGV4cGxpY2l0IHNvY2lhbCBuZXR3b3JrIGFwcHJvYWNoIGhhcyBiZWVuIHNjYXJjZS4gPGJyPg0KDQpbSW5zZXJ0IHRoZSBiZW5lZml0cyBvZiBhbiBleHBsaWNpdCBzb2NpYWwgbmV0d29yayBhcHByb2FjaCwgc3VjaCBhcyBpbGx1bWluYXRpbmcgdGhlIHN0cmF0ZWdpZXMgYW5kIGNvbnNlcXVlbmNlcyBvZiBwcmV2aW91c2x5IGZvcm1lZCB0aWVzLCBpbnRlcmRlcGVuZGVuY2llcykuIEluIHRoaXMgcGFwZXIsIEkgd2lsbCBhbmFseXplIER1dGNoIHBhcmxpYW1lbnRhcnkgdm90aW5nIGFuZCBpdOKAmXMgc3RydWN0dXJhbCBjaGFuZ2VzLCBwcm9wb3NpbmcgdGhlIGZvbGxvd2luZyB0d28gcmVzZWFyY2ggcXVlc3Rpb25zOg0KDQoqVG8gd2hhdCBleHRlbnQgaXMgdGhlcmUgc2VncmVnYXRpb24gaW4gY28tdm90aW5nIGFtb25nIHBvbGl0aWNhbCBwYXJ0aWVzPyBIb3cgaGFzIHRoaXMgZGV2ZWxvcGVkIG92ZXIgdGltZSo/DQoNCipUbyB3aGF0IGV4dGVudCBjYW4gY28tdm90aW5nIHNlZ3JlZ2F0aW9uIHBhdHRlcm5zIGJlIGF0dHJpYnV0ZWQgdG8gY2hhbmdlcyBpbiBpZGVvbG9naWNhbCBkaXN0YW5jZT8qDQo=</div>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeSourceEmbed("introduction_manuscript.Rmd");
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
